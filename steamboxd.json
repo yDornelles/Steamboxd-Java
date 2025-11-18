@@ -1,0 +1,127 @@
+{
+  "jogos": [
+    {
+      "desenvolvedora": "Insomniac Games",
+      "multiplayer": false,
+      "preco": 249.9,
+      "titulo": "Spider Man",
+      "generos": [
+        "Ação"
+      ],
+      "nota": 0.0,
+      "anoLancamento": 2022,
+      "plataformas": [
+        "ps4"
+      ]
+    },
+    {
+      "desenvolvedora": "Team Cherry",
+      "multiplayer": false,
+      "preco": 49.99,
+      "titulo": "Hollow Knight",
+      "generos": [
+        "Soulslike",
+        "Plataforma",
+        "Metroidvania"
+      ],
+      "nota": 0.0,
+      "anoLancamento": 2017,
+      "plataformas": [
+        "pc",
+        "ps5"
+      ]
+    },
+    {
+      "desenvolvedora": "Supercell",
+      "multiplayer": true,
+      "preco": 0.0,
+      "titulo": "Clash Royale",
+      "generos": [
+        "Estrategia"
+      ],
+      "nota": 0.0,
+      "anoLancamento": 2014,
+      "plataformas": [
+        "Android",
+        "IOS"
+      ]
+    }
+  ],
+  "dlcs": [
+    {
+      "jogoBase": "Spider Man",
+      "expansao": true,
+      "preco": 49.9,
+      "titulo": "A cidade que nunca dorme",
+      "generos": [
+        "Ação"
+      ],
+      "nota": 0.0,
+      "anoLancamento": 2024,
+      "plataformas": [
+        "ps5"
+      ]
+    }
+  ],
+  "usuarios": [
+    {
+      "nome": "Gabriel",
+      "email": "gabriel@gmail",
+      "biblioteca": [
+        {
+          "type": "Jogo",
+          "desenvolvedora": "Insomniac Games",
+          "multiplayer": false,
+          "preco": 249.9,
+          "titulo": "Spider Man",
+          "generos": [
+            "Ação"
+          ],
+          "nota": 9.8,
+          "anoLancamento": 2022,
+          "plataformas": [
+            "ps4"
+          ]
+        },
+        {
+          "type": "Jogo",
+          "desenvolvedora": "Team Cherry",
+          "multiplayer": false,
+          "preco": 46.99,
+          "titulo": "Hollow Knight",
+          "generos": [
+            "Soulslike",
+            "Plataforma"
+          ],
+          "nota": 10.0,
+          "anoLancamento": 2017,
+          "plataformas": [
+            "pc"
+          ]
+        }
+      ]
+    },
+    {
+      "nome": "dornelles",
+      "email": "dornelles@gmail.com",
+      "biblioteca": [
+        {
+          "type": "Jogo",
+          "desenvolvedora": "Supercell",
+          "multiplayer": true,
+          "preco": 0.0,
+          "titulo": "Clash Royale",
+          "generos": [
+            "Estrategia"
+          ],
+          "nota": 9.8,
+          "anoLancamento": 2014,
+          "plataformas": [
+            "Android",
+            "IOS"
+          ]
+        }
+      ]
+    }
+  ]
+}
