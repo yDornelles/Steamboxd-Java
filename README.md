@@ -30,11 +30,11 @@ Abaixo, uma breve demonstração das duas interfaces do sistema.
 
 #### Interface Gráfica (Swing)
 *(Implementada com `JTabbedPane` para separar as entidades e `JSplitPane` para o gerenciamento de usuários e suas bibliotecas)*
-![Interface Gráfica do SteamBoxd](https://imgur.com/a/ZeupPza)
+![Interface Gráfica do SteamBoxd](https://i.imgur.com/zMvFPsc.png)
 
 #### Interface Textual (Console)
 *(Implementada com um loop de menu robusto e tratamento de entrada de usuário)*
-![Interface Textual do SteamBoxd](https://imgur.com/a/KeNf7yn)
+![Interface Textual do SteamBoxd](https://i.imgur.com/Dk2TDdW.png)
 
 ---
 
