@@ -1,5 +1,7 @@
 package steamboxd.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,6 +15,7 @@ public class Jogo extends Midia {
     private String desenvolvedora;
     private boolean multiplayer;
     private double preco;
+    private List<String> dlcTitulos;
 
     /**
      * Construtor completo para criar um Jogo com todos os detalhes.
@@ -26,6 +29,7 @@ public class Jogo extends Midia {
         this.desenvolvedora = desenvolvedora != null ? desenvolvedora : "";
         this.multiplayer = multiplayer;
         this.preco = preco;
+        this.dlcTitulos = new ArrayList<>();
     }
 
     /**
@@ -40,6 +44,7 @@ public class Jogo extends Midia {
         this.desenvolvedora = "";
         this.multiplayer = false;
         this.preco = 0.0;
+        this.dlcTitulos = new ArrayList<>();
     }
 
     /**
@@ -51,6 +56,7 @@ public class Jogo extends Midia {
      */
     public Jogo (String titulo) {
         super(titulo);
+        this.dlcTitulos = new ArrayList<>();
     }
 
     /**
@@ -64,6 +70,7 @@ public class Jogo extends Midia {
         this.desenvolvedora = "";
         this.multiplayer = false;
         this.preco = 0.0;
+        this.dlcTitulos = new ArrayList<>();
     }
 
     /**
@@ -75,6 +82,15 @@ public class Jogo extends Midia {
         this.desenvolvedora = original.desenvolvedora;
         this.multiplayer = original.multiplayer;
         this.preco = original.preco;
+        this.dlcTitulos = new ArrayList<>(original.dlcTitulos);
+    }
+
+    public List<String> getDlcTitulos() {
+        return new ArrayList<>(dlcTitulos);
+    }
+
+    public void setDlcTitulos(List<String> dlcTitulos) {
+        this.dlcTitulos = new ArrayList<>(dlcTitulos);
     }
 
     public String getDesenvolvedora() {

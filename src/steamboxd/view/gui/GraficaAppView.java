@@ -5,6 +5,7 @@ import steamboxd.view.IAppView;
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.Component;
 
 /**
  * Produto Concreto (GUI).
@@ -69,10 +70,25 @@ public class GraficaAppView implements IAppView {
             // Cria as Abas (JTabbedPane)
             JTabbedPane tabbedPane = new JTabbedPane();
 
+            PainelJogos painelJogos = new PainelJogos();
+            PainelDLCs painelDLCs = new PainelDLCs();
+            PainelUsuarios painelUsuarios = new PainelUsuarios();
+
             // Adiciona os painéis de CRUD
-            tabbedPane.addTab("Jogos", new PainelJogos());
-            tabbedPane.addTab("DLCs", new PainelDLCs());
-            tabbedPane.addTab("Usuários", new PainelUsuarios());
+            tabbedPane.addTab("Jogos", painelJogos);
+            tabbedPane.addTab("DLCs", painelDLCs);
+            tabbedPane.addTab("Usuários", painelUsuarios);
+
+            tabbedPane.addChangeListener(e -> {
+                Component abaSelecionada = tabbedPane.getSelectedComponent();
+
+                if (abaSelecionada == painelJogos) {
+                    painelJogos.atualizarTabela();
+                }
+                else if (abaSelecionada == painelUsuarios) {
+                    painelUsuarios.atualizarTabelaUsuarios();
+                }
+            });
 
             frame.add(tabbedPane);
 

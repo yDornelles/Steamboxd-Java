@@ -24,7 +24,7 @@ public class PainelDLCs extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // --- Tabela ---
-        String[] colunas = {"Título", "Jogo Base", "Ano", "Preço", "Expansão?", "Gêneros", "Plataformas"};
+        String[] colunas = {"Título", "Jogo Base (Título)", "Ano", "Preço", "Expansão?", "Gêneros", "Plataformas"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -64,7 +64,7 @@ public class PainelDLCs extends JPanel {
 
             tableModel.addRow(new Object[]{
                     dlc.getTitulo(),
-                    dlc.getJogoBase(),
+                    dlc.getJogoBaseTitulo(),
                     dlc.getAnoLancamento(),
                     dlc.getPreco(),
                     dlc.isExpansao() ? "Sim" : "Não",
@@ -109,7 +109,7 @@ public class PainelDLCs extends JPanel {
         painel.add(txtTitulo, gbc);
 
         gbc.gridx = 0; gbc.gridy = linha; gbc.weightx = 0.0;
-        painel.add(new JLabel("Jogo Base:"), gbc);
+        painel.add(new JLabel("Jogo Base (Título):"), gbc);
         gbc.gridx = 1; gbc.gridy = linha++; gbc.weightx = 1.0;
         painel.add(txtJogoBase, gbc);
 

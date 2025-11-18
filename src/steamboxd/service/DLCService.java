@@ -2,7 +2,9 @@ package steamboxd.service;
 
 import steamboxd.data.Sistema;
 import steamboxd.model.DLC;
+import steamboxd.model.Jogo;
 import steamboxd.repository.DLCRepository;
+import steamboxd.repository.JogoRepository;
 import java.util.List;
 
 /**
@@ -13,19 +15,51 @@ import java.util.List;
 public class DLCService implements MidiaService<DLC> {
 
     private DLCRepository repository;
+    private JogoRepository jogoRepository;
 
     public DLCService() {
         this.repository = Sistema.getInstance().getDlcRepository();
+        this.jogoRepository = Sistema.getInstance().getJogoRepository();
     }
 
     @Override
     public void adicionar(DLC dlc) {
         repository.adicionar(dlc);
+
+        String jogoTitulo = dlc.getJogoBaseTitulo();
+        if (jogoTitulo != null && !jogoTitulo.isBlank()) {
+            Jogo jogo = jogoRepository.buscar(jogoTitulo);
+            if (jogo != null) {
+                List<String> dlcTitulos = jogo.getDlcTitulos();
+                if (!dlcTitulos.contains(dlc.getTitulo())) {
+                    dlcTitulos.add(dlc.getTitulo());
+                    jogo.setDlcTitulos(dlcTitulos);
+                }
+            }
+        }
     }
 
     @Override
     public boolean remover(String titulo) {
-        return repository.remover(titulo);
+        DLC dlc = repository.buscar(titulo);
+        if (dlc == null) {
+            return false;
+        }
+
+        boolean removido = repository.remover(titulo);
+
+        if (removido) {
+            String jogoTitulo = dlc.getJogoBaseTitulo();
+            if (jogoTitulo != null && !jogoTitulo.isBlank()) {
+                Jogo jogo = jogoRepository.buscar(jogoTitulo);
+                if (jogo != null) {
+                    List<String> dlcTitulos = jogo.getDlcTitulos();
+                    dlcTitulos.remove(dlc.getTitulo());
+                    jogo.setDlcTitulos(dlcTitulos);
+                }
+            }
+        }
+        return removido;
     }
 
     @Override

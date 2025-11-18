@@ -24,7 +24,7 @@ public class PainelJogos extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // --- Tabela ---
-        String[] colunas = {"Título", "Ano", "Preço", "Dev", "Multiplayer", "Gêneros", "Plataformas"};
+        String[] colunas = {"Título", "Ano", "Preço", "Dev", "Multiplayer", "Gêneros", "Plataformas", "Nº DLCs"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -55,7 +55,7 @@ public class PainelJogos extends JPanel {
     /**
      * Preenche a tabela.
      */
-    private void atualizarTabela() {
+    public void atualizarTabela() {
         tableModel.setRowCount(0);
         List<Jogo> jogos = jogoController.listarJogos();
         for (Jogo jogo : jogos) {
@@ -69,7 +69,8 @@ public class PainelJogos extends JPanel {
                     jogo.getDesenvolvedora(),
                     jogo.isMultiplayer() ? "Sim" : "Não",
                     generos,
-                    plataformas
+                    plataformas,
+                    jogo.getDlcTitulos().size()
             });
         }
     }

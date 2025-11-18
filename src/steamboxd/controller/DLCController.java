@@ -27,9 +27,9 @@ public class DLCController {
      * e o envia para a camada de serviço para adição.
      */
     public void adicionarDLC(String titulo, double nota, int ano, List<String> generos,
-                             List<String> plataformas, String jogoBase, boolean expansao, double preco) {
+                             List<String> plataformas, String jogoBaseTitulo, boolean expansao, double preco) {
 
-        DLC dlc = new DLC(titulo, generos, nota, ano, plataformas, jogoBase, expansao, preco);
+        DLC dlc = new DLC(titulo, generos, nota, ano, plataformas, jogoBaseTitulo, expansao, preco);
 
         dlcService.adicionar(dlc);
     }

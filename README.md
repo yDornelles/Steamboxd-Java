@@ -17,7 +17,8 @@ Todo o estado da aplicação (listas de jogos, DLCs e usuários) é salvo em um 
 ## Funcionalidades Principais
 
 * **Interface Dupla:** O sistema pode ser executado em modo **Gráfico (Swing)** ou **Textual (Console)** através de uma única configuração.
-* **Gerenciamento da "Loja":** CRUD completo para Jogos e DLCs.
+* **Gerenciamento da "Loja":** * CRUD completo para Jogos e DLCs.
+    * **Vínculo Jogo-DLC:** O sistema gerencia a relação onde um Jogo pode possuir múltiplas DLCs, e uma DLC pertence a um Jogo base.
 * **Gerenciamento de Usuários:** CRUD completo para Usuários, incluindo validação de email duplicado.
 * **Biblioteca Pessoal:**
     * Adicionar/Remover mídias da "Loja" para a biblioteca de um usuário.
@@ -30,11 +31,11 @@ Abaixo, uma breve demonstração das duas interfaces do sistema.
 
 #### Interface Gráfica (Swing)
 *(Implementada com `JTabbedPane` para separar as entidades e `JSplitPane` para o gerenciamento de usuários e suas bibliotecas)*
-![Interface Gráfica do SteamBoxd](https://i.imgur.com/zMvFPsc.png)
+![Interface Gráfica do SteamBoxd](https://i.imgur.com/ZN9tM9b.png)
 
 #### Interface Textual (Console)
 *(Implementada com um loop de menu robusto e tratamento de entrada de usuário)*
-![Interface Textual do SteamBoxd](https://i.imgur.com/Dk2TDdW.png)
+![Interface Textual do SteamBoxd](https://i.imgur.com/zkuJtuN.png)
 
 ---
 
@@ -47,6 +48,7 @@ O projeto foi estruturado para maximizar a **Separação de Responsabilidades (S
 A arquitetura segue um padrão `Controller-Service-Repository` rigoroso, que isola a lógica de negócio das outras partes do sistema.
 
 1.  **`View`** (GUI ou Textual): A camada mais externa. É "burra" e apenas exibe dados e captura a entrada do usuário. **Nunca** contém lógica de negócio.
+    * *Destaque:* A GUI implementa `ChangeListeners` para sincronizar dados entre painéis.
 2.  **`Controller`**: A "fachada" que a View acessa. Sua única função é traduzir as ações da View (ex: cliques de botão, comandos de texto) em chamadas para o `Service` e retornar o resultado.
 3.  **`Service`**: O "cérebro" do sistema. **100% da lógica de negócio** reside aqui (ex: validar se uma nota é de 0-10, verificar se um email já existe, orquestrar a clonagem de mídias).
 4.  **`Repository`**: Abstrai a coleção de dados. Gerencia a `ArrayList` de cada entidade, sem saber *por que* está salvando.
@@ -62,7 +64,9 @@ Para atender ao requisito de interface flexível (GUI ou Textual), foi usado o p
 ### Herança e Polimorfismo (O Coração da POO)
 
 * **Abstração:** A classe abstrata `Midia` define o contrato base (atributos como `titulo`, `nota`, e o método `getTipo()`).
-* **Herança:** As classes `Jogo` e `DLC` estendem `Midia`, adicionando seus próprios atributos (`desenvolvedora`, `jogoBase`, etc.).
+* **Herança:** As classes `Jogo` e `DLC` estendem `Midia`.
+    * `Jogo`: Possui lista de títulos de suas DLCs (`dlcTitulos`).
+    * `DLC`: Possui referência ao seu jogo pai (`jogoBaseTitulo`).
 * **Polimorfismo:** O conceito é usado de forma central na `List<Midia>` da classe `Usuario`. Isso permite que a biblioteca armazene ambos, `Jogo` e `DLC`, de forma transparente. As interfaces (`Repository<T>`, `MidiaService<T>`) também fazem uso pesado de genéricos e polimorfismo.
 
 ### Padrões de Infraestrutura (Singleton e DAO)
@@ -75,6 +79,10 @@ Para atender ao requisito de interface flexível (GUI ou Textual), foi usado o p
 Um desafio técnico significativo foi persistir a `List<Midia>`, pois o Gson, ao ler o JSON, não sabe se deve instanciar `new Jogo()` ou `new DLC()` (já que `Midia` é abstrata).
 
 Isso foi resolvido com um `RuntimeTypeAdapterFactory` (uma ferramenta padrão do ecossistema Gson). Essa fábrica "ensina" o Gson a injetar um campo `"type": "Jogo"` ou `"type": "DLC"` no JSON ao salvar, permitindo que o polimorfismo funcione perfeitamente durante o carregamento dos dados.
+
+## Diagrama UML
+
+![Diagrama UML](https://i.imgur.com/fAqrBLg.png)
 
 ## Tecnologias e Dependências
 

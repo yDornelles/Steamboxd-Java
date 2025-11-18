@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class DLC extends Midia {
 
-    private String jogoBase;
+    private String jogoBaseTitulo;
     private boolean expansao;
     private double preco;
 
@@ -20,9 +20,9 @@ public class DLC extends Midia {
      * convertendo listas e strings nulas para valores padrão.
      * </p>
      */
-    public DLC (String titulo, List<String> generos, double nota, int anoLancamento, List<String> plataformas, String jogoBase, boolean expansao, double preco) {
+    public DLC (String titulo, List<String> generos, double nota, int anoLancamento, List<String> plataformas, String jogoBaseTitulo, boolean expansao, double preco) {
         super(titulo, generos != null ? generos : List.of(), nota, anoLancamento, plataformas != null ? plataformas : List.of());
-        this.jogoBase = jogoBase != null ? jogoBase : "";
+        this.jogoBaseTitulo = jogoBaseTitulo != null ? jogoBaseTitulo : "";
         this.expansao = expansao;
         this.preco = preco;
     }
@@ -34,9 +34,9 @@ public class DLC extends Midia {
      * inicializando os demais campos com valores padrão.
      * </p>
      */
-    public DLC (String titulo, String jogoBase) {
+    public DLC (String titulo, String jogoBaseTitulo) {
         super(titulo);
-        this.jogoBase = jogoBase != null ? jogoBase : "";
+        this.jogoBaseTitulo = jogoBaseTitulo != null ? jogoBaseTitulo : "";
         this.expansao = false;
         this.preco = 0.0;
     }
@@ -49,7 +49,7 @@ public class DLC extends Midia {
      */
     public DLC () {
         super();
-        this.jogoBase = "";
+        this.jogoBaseTitulo = "";
         this.expansao = false;
         this.preco = 0.0;
     }
@@ -60,17 +60,17 @@ public class DLC extends Midia {
      */
     public DLC(DLC original) {
         super(original);
-        this.jogoBase = original.jogoBase;
+        this.jogoBaseTitulo = original.jogoBaseTitulo;
         this.expansao = original.expansao;
         this.preco = original.preco;
     }
 
-    public String getJogoBase() {
-        return jogoBase;
+    public String getJogoBaseTitulo() {
+        return jogoBaseTitulo;
     }
 
-    public void setJogoBase(String jogoBase) {
-        this.jogoBase = jogoBase;
+    public void setJogoBaseTitulo(String jogoBaseTitulo) {
+        this.jogoBaseTitulo = jogoBaseTitulo;
     }
 
     public boolean isExpansao() {

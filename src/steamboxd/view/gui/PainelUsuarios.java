@@ -112,7 +112,7 @@ public class PainelUsuarios extends JPanel {
     }
 
     // --- Métodos de Atualização ---
-    private void atualizarTabelaUsuarios() {
+    public void atualizarTabelaUsuarios() {
         modelUsuarios.setRowCount(0);
         List<Usuario> usuarios = usuarioController.listarUsuarios();
         for (Usuario u : usuarios) {

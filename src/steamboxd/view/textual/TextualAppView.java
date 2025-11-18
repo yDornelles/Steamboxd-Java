@@ -166,6 +166,7 @@ public class TextualAppView implements IAppView {
             System.out.println("Gêneros: " + String.join(", ", jogo.getGeneros()));
             System.out.println("Plataformas: " + String.join(", ", jogo.getPlataformas()));
             System.out.println("Multiplayer: " + (jogo.isMultiplayer() ? "Sim" : "Não"));
+            System.out.println("DLCs cadastradas: " + jogo.getDlcTitulos().size());
         }
         System.out.println("--------------------");
     }
@@ -291,14 +292,14 @@ public class TextualAppView implements IAppView {
     private void adicionarDLC() {
         System.out.println("\n-> Adicionar Nova DLC");
         String titulo = ConsoleUtil.lerString("Título: ");
-        String jogoBase = ConsoleUtil.lerString("Jogo Base: ");
+        String jogoBaseTitulo = ConsoleUtil.lerString("Título do Jogo Base: ");
         int ano = ConsoleUtil.lerInt("Ano de Lançamento: ");
         List<String> generos = ConsoleUtil.lerListaStrings("Gêneros: ");
         List<String> plataformas = ConsoleUtil.lerListaStrings("Plataformas: ");
         double preco = ConsoleUtil.lerDouble("Preço: ");
         boolean ex = ConsoleUtil.lerBoolean("Tem expansão (s/n): ");
 
-        dlcController.adicionarDLC(titulo, 0.0, ano, generos, plataformas, jogoBase, ex, preco);
+        dlcController.adicionarDLC(titulo, 0.0, ano, generos, plataformas, jogoBaseTitulo, ex, preco);
         System.out.println("DLC '" + titulo + "' adicionada com sucesso!");
     }
 
@@ -317,7 +318,7 @@ public class TextualAppView implements IAppView {
         for (var dlc : dlcs) {
             System.out.println("--------------------");
             System.out.println("Título: " + dlc.getTitulo() + " (" + dlc.getAnoLancamento() + ")");
-            System.out.println("Jogo Base: " + dlc.getJogoBase());
+            System.out.println("Jogo Base: " + dlc.getJogoBaseTitulo());
             System.out.println("Preço: R$ " + dlc.getPreco());
             System.out.println("Gêneros: " + String.join(", ", dlc.getGeneros()));
             System.out.println("Plataformas: " + String.join(", ", dlc.getPlataformas()));
@@ -660,7 +661,7 @@ public class TextualAppView implements IAppView {
 
                 System.out.println("Tipo: DLC");
                 System.out.println("Título: " + dlc.getTitulo() + " (" + dlc.getAnoLancamento() + ")");
-                System.out.println("Jogo Base: " + dlc.getJogoBase());
+                System.out.println("Jogo Base: " + dlc.getJogoBaseTitulo());
                 System.out.println("Preço: R$ " + dlc.getPreco());
                 System.out.println("Nota: " + dlc.getNota());
                 System.out.println("Gêneros: " + String.join(", ", dlc.getGeneros()));
