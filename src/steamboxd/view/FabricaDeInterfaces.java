@@ -10,7 +10,7 @@ import steamboxd.view.gui.GraficaUIFactory;
 public class FabricaDeInterfaces {
 
     // TipoInterface.GRAFICA ou TipoInterface.TEXTUAL
-    private static final TipoInterface TIPO_ATUAL = TipoInterface.GRAFICA;
+    private static final TipoInterface TIPO_ATUAL = TipoInterface.TEXTUAL;
 
     /**
      * Método estático que retorna a fábrica concreta baseada na configuração.

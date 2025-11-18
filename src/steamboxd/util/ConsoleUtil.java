@@ -133,7 +133,6 @@ public class ConsoleUtil {
             if ("0".equals(item)) {
                 break;
             }
-
             if (!item.isBlank()) {
                 lista.add(item);
             }
