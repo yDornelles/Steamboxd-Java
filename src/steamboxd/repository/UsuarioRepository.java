@@ -3,6 +3,7 @@ package steamboxd.repository;
 import java.util.ArrayList;
 import java.util.List;
 import steamboxd.model.Usuario;
+import steamboxd.model.Midia;
 
 /**
  * Implementação concreta do {@link Repository} para gerenciar objetos {@link Usuario}.
@@ -54,5 +55,21 @@ public class UsuarioRepository implements Repository<Usuario> {
     public void carregarDados(List<Usuario> novosDados) {
         this.usuarios.clear();
         this.usuarios.addAll(novosDados);
+    }
+
+    /**
+     * Remove uma mídia (pelo título) da biblioteca de TODOS os usuários.
+     * Usado quando uma mídia é deletada da loja.
+     */
+    public void removerMidiaDeTodos(String tituloMidia) {
+        for (Usuario usuario : usuarios) {
+            List<Midia> biblioteca = usuario.getBiblioteca(); //
+
+            boolean alterou = biblioteca.removeIf(m -> m.getTitulo().equalsIgnoreCase(tituloMidia));
+
+            if (alterou) {
+                usuario.setBiblioteca(biblioteca); //
+            }
+        }
     }
 }

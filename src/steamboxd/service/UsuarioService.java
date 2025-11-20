@@ -23,6 +23,25 @@ public class UsuarioService {
     }
 
     public boolean adicionarUsuario(Usuario usuario) {
+        if (usuario.getNome() != null) {
+            usuario.setNome(usuario.getNome().trim());
+        }
+        if (usuario.getEmail() != null) {
+            usuario.setEmail(usuario.getEmail().trim());
+        }
+        if (usuario.getNome() == null || usuario.getNome().isBlank()) {
+            throw new IllegalArgumentException("O nome do usuário é obrigatório.");
+        }
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
+            throw new IllegalArgumentException("O email do usuário é obrigatório.");
+        }
+        if (!usuario.getEmail().contains("@gmail.com")) {
+            throw new IllegalArgumentException("O email deve ser válido (conter '@gmail.com').");
+        }
+        if (usuario.getEmail().contains(" ")) {
+            throw new IllegalArgumentException("O email não pode conter espaços.");
+        }
+
         if (repository.existe(usuario.getEmail())) {
             return false;
         }
@@ -47,10 +66,27 @@ public class UsuarioService {
         if (user == null) {
             return false;
         }
-        if (novoNome != null && !novoNome.isBlank()) {
+
+        if (novoNome != null) {
+            novoNome = novoNome.trim();
+            if (novoNome.isBlank()) {
+                throw new IllegalArgumentException("O novo nome não pode ser vazio.");
+            }
             user.setNome(novoNome);
         }
-        if (novoEmail != null && !novoEmail.isBlank() && !novoEmail.equalsIgnoreCase(emailAtual)) {
+
+        if (novoEmail != null && !novoEmail.equalsIgnoreCase(emailAtual)) {
+            novoEmail = novoEmail.trim();
+            if (novoEmail.isBlank()) {
+                throw new IllegalArgumentException("O novo email não pode ser vazio.");
+            }
+            if (!novoEmail.contains("@gmail.com")) {
+                throw new IllegalArgumentException("O novo email deve ser válido (conter '@gmail.com').");
+            }
+            if (novoEmail.contains(" ")) {
+                throw new IllegalArgumentException("O email não pode conter espaços.");
+            }
+
             if (repository.existe(novoEmail)) {
                 return false;
             }
@@ -63,6 +99,13 @@ public class UsuarioService {
         Usuario user = repository.buscar(email);
         if (user != null && midia != null) {
 
+            List<Midia> bibliotecaAtual = user.getBiblioteca();
+            for (Midia m : bibliotecaAtual) {
+                if (m.getTitulo().equalsIgnoreCase(midia.getTitulo())) {
+                    return false;
+                }
+            }
+
             Midia midiaClone;
 
             if (midia instanceof Jogo) {
@@ -74,9 +117,7 @@ public class UsuarioService {
             }
 
             List<Midia> biblioteca = user.getBiblioteca();
-
             biblioteca.add(midiaClone);
-
             user.setBiblioteca(biblioteca);
             return true;
         }

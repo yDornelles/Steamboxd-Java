@@ -59,14 +59,28 @@ public class PainelJogos extends JPanel {
         tableModel.setRowCount(0);
         List<Jogo> jogos = jogoController.listarJogos();
         for (Jogo jogo : jogos) {
-            String generos = String.join(", ", jogo.getGeneros());
-            String plataformas = String.join(", ", jogo.getPlataformas());
+            List<String> listaGeneros = jogo.getGeneros();
+            String generos = listaGeneros.isEmpty() ? "N/A" : String.join(", ", listaGeneros);
+
+            List<String> listaPlataformas = jogo.getPlataformas();
+            String plataformas = listaPlataformas.isEmpty() ? "N/A" : String.join(", ", listaPlataformas);
+
+            Object anoExibicao = (jogo.getAnoLancamento() == 0) ? "N/A" : jogo.getAnoLancamento();
+
+            String devExibicao = jogo.getDesenvolvedora().isEmpty() ? "N/A" : jogo.getDesenvolvedora();
+
+            Object precoExibicao;
+            if (jogo.getPreco() == 0.0) {
+                precoExibicao = "Grátis";
+            } else {
+                precoExibicao = String.format("R$ %.2f", jogo.getPreco());
+            }
 
             tableModel.addRow(new Object[]{
                     jogo.getTitulo(),
-                    jogo.getAnoLancamento(),
-                    jogo.getPreco(),
-                    jogo.getDesenvolvedora(),
+                    anoExibicao,
+                    precoExibicao,
+                    devExibicao,
                     jogo.isMultiplayer() ? "Sim" : "Não",
                     generos,
                     plataformas,
@@ -162,26 +176,43 @@ public class PainelJogos extends JPanel {
             JCheckBox chkMulti = (JCheckBox) campos[6];
 
             try {
-                // Converte as strings de vírgula em Listas
                 List<String> generos = Arrays.stream(txtGeneros.getText().split(","))
-                        .map(String::trim).collect(Collectors.toList());
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
                 List<String> plataformas = Arrays.stream(txtPlataformas.getText().split(","))
-                        .map(String::trim).collect(Collectors.toList());
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
+
+                int ano = 0;
+                if (!txtAno.getText().isBlank()) {
+                    ano = Integer.parseInt(txtAno.getText());
+                }
+
+                String precoTxt = txtPreco.getText().replace(',', '.').trim();
+                double preco = 0.0;
+                if (!precoTxt.isEmpty()) {
+                    preco = Double.parseDouble(precoTxt);
+                }
 
                 jogoController.adicionarJogo(
                         txtTitulo.getText(),
                         0.0,
-                        Integer.parseInt(txtAno.getText()),
+                        ano,
                         generos,
                         plataformas,
                         txtDev.getText(),
                         chkMulti.isSelected(),
-                        Double.parseDouble(txtPreco.getText())
+                        preco
                 );
                 atualizarTabela();
 
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Erro: Ano e Preço devem ser números válidos.", "Erro de Formato", JOptionPane.ERROR_MESSAGE);
+            } catch (IllegalArgumentException ex) {
+
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Validação", JOptionPane.WARNING_MESSAGE);
             }
         }
     }
@@ -208,25 +239,46 @@ public class PainelJogos extends JPanel {
                 case 0: // Editar Preço
                     String novoPrecoStr = JOptionPane.showInputDialog(this, "Novo Preço:", jogo.getPreco());
                     if (novoPrecoStr != null) {
-                        sucesso = jogoController.editarPreco(titulo, Double.parseDouble(novoPrecoStr));
+                        String precoTratado = novoPrecoStr.replace(",", ".").trim();
+                        double novoPreco = 0.0;
+                        if (!precoTratado.isEmpty()) {
+                            novoPreco = Double.parseDouble(precoTratado);
+                        }
+                        sucesso = jogoController.editarPreco(titulo, novoPreco);
                     }
                     break;
                 case 1: // Editar Ano
-                    String novoAnoStr = JOptionPane.showInputDialog(this, "Novo Ano:", jogo.getAnoLancamento());
+                    String valorAtual = (jogo.getAnoLancamento() == 0) ? "" : String.valueOf(jogo.getAnoLancamento());
+                    String novoAnoStr = JOptionPane.showInputDialog(this, "Novo Ano (deixe vazio para 'N/A'):", valorAtual);
+
                     if (novoAnoStr != null) {
-                        sucesso = jogoController.editarAno(titulo, Integer.parseInt(novoAnoStr));
+                        int novoAno = 0;
+                        if (!novoAnoStr.isBlank()) {
+                            novoAno = Integer.parseInt(novoAnoStr);
+                        }
+                        sucesso = jogoController.editarAno(titulo, novoAno);
                     }
                     break;
                 case 2: // Adicionar Gênero
                     String novoGenero = JOptionPane.showInputDialog(this, "Adicionar Gênero:");
                     if (novoGenero != null && !novoGenero.isBlank()) {
-                        sucesso = jogoController.adicionarGenero(titulo, novoGenero);
+                        String[] lista = novoGenero.split(",");
+                        for (String g : lista) {
+                            if (!g.trim().isEmpty()) {
+                                sucesso = jogoController.adicionarGenero(titulo, g.trim());
+                            }
+                        }
                     }
                     break;
                 case 3: // Adicionar Plataforma
                     String novaPlataforma = JOptionPane.showInputDialog(this, "Adicionar Plataforma:");
                     if (novaPlataforma != null && !novaPlataforma.isBlank()) {
-                        sucesso = jogoController.adicionarPlataforma(titulo, novaPlataforma);
+                        String[] lista = novaPlataforma.split(",");
+                        for (String p : lista) {
+                            if (!p.trim().isEmpty()) {
+                                sucesso = jogoController.adicionarPlataforma(titulo, p.trim());
+                            }
+                        }
                     }
                     break;
                 case 4: // Cancelar
@@ -238,10 +290,12 @@ public class PainelJogos extends JPanel {
                 JOptionPane.showMessageDialog(this, "Alteração realizada com sucesso!");
                 atualizarTabela();
             } else {
-                JOptionPane.showMessageDialog(this, "Falha ao realizar alteração.", "Erro", JOptionPane.ERROR_MESSAGE);
+                atualizarTabela();
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Valor numérico inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Validação", JOptionPane.ERROR_MESSAGE);
         }
     }
 

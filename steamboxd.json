@@ -3,7 +3,7 @@
     {
       "desenvolvedora": "Insomniac Games",
       "multiplayer": false,
-      "preco": 249.9,
+      "preco": 244.9,
       "dlcTitulos": [
         "A cidade que nunca dorme"
       ],
@@ -20,7 +20,7 @@
     {
       "desenvolvedora": "Team Cherry",
       "multiplayer": false,
-      "preco": 49.99,
+      "preco": 69.9,
       "dlcTitulos": [],
       "titulo": "Hollow Knight",
       "generos": [
@@ -50,13 +50,27 @@
         "Android",
         "IOS"
       ]
+    },
+    {
+      "desenvolvedora": "",
+      "multiplayer": true,
+      "preco": 0.0,
+      "dlcTitulos": [
+        "Jantar no RU",
+        "HH"
+      ],
+      "titulo": "UFSC",
+      "generos": [],
+      "nota": 0.0,
+      "anoLancamento": 0,
+      "plataformas": []
     }
   ],
   "dlcs": [
     {
       "jogoBaseTitulo": "Spider man",
       "expansao": true,
-      "preco": 29.9,
+      "preco": 49.9,
       "titulo": "A cidade que nunca dorme",
       "generos": [
         "ação"
@@ -66,12 +80,37 @@
       "plataformas": [
         "ps5"
       ]
+    },
+    {
+      "jogoBaseTitulo": "UFSC",
+      "expansao": true,
+      "preco": 1.5,
+      "titulo": "Jantar no RU",
+      "generos": [],
+      "nota": 0.0,
+      "anoLancamento": 0,
+      "plataformas": []
+    },
+    {
+      "jogoBaseTitulo": "UFSC",
+      "expansao": true,
+      "preco": 0.0,
+      "titulo": "HH",
+      "generos": [
+        "Festa",
+        "MMORPG IRL"
+      ],
+      "nota": 0.0,
+      "anoLancamento": 0,
+      "plataformas": [
+        "IRL"
+      ]
     }
   ],
   "usuarios": [
     {
       "nome": "Gabriel",
-      "email": "gabriel@gmail",
+      "email": "gabriel@gmail.com",
       "biblioteca": [
         {
           "type": "Jogo",

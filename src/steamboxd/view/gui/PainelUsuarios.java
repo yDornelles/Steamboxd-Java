@@ -179,11 +179,15 @@ public class PainelUsuarios extends JPanel {
             JTextField txtNome = (JTextField) campos[0];
             JTextField txtEmail = (JTextField) campos[1];
 
-            boolean sucesso = usuarioController.criarUsuario(txtNome.getText(), txtEmail.getText());
-            if (!sucesso) {
-                JOptionPane.showMessageDialog(this, "Erro: Email '" + txtEmail.getText() + "' já cadastrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+            try {
+                boolean sucesso = usuarioController.criarUsuario(txtNome.getText(), txtEmail.getText());
+                if (!sucesso) {
+                    JOptionPane.showMessageDialog(this, "Erro: Email '" + txtEmail.getText() + "' já cadastrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+                atualizarTabelaUsuarios();
+            } catch (IllegalArgumentException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Erro de Validação", JOptionPane.WARNING_MESSAGE);
             }
-            atualizarTabelaUsuarios();
         }
     }
 
@@ -206,16 +210,22 @@ public class PainelUsuarios extends JPanel {
             String novoEmail = txtEmail.getText();
             String novoNome = txtNome.getText();
 
-            boolean sucesso = usuarioController.editarUsuario(usuarioSelecionado.getEmail(), txtNome.getText(), txtEmail.getText());
-            if (!sucesso) {
-                JOptionPane.showMessageDialog(this, "Erro: Novo email '" + txtEmail.getText() + "' já está em uso.", "Erro", JOptionPane.ERROR_MESSAGE);
-                usuarioSelecionado = usuarioController.buscarUsuario(emailOriginal);
-            }  else {
-            usuarioSelecionado = usuarioController.buscarUsuario(novoEmail);
-            }
+            try {
+                boolean sucesso = usuarioController.editarUsuario(usuarioSelecionado.getEmail(), novoNome, novoEmail);
 
-            atualizarTabelaUsuarios();
-            atualizarTabelaBiblioteca();
+                if (!sucesso) {
+                    JOptionPane.showMessageDialog(this, "Erro: Novo email '" + novoEmail + "' já está em uso.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    usuarioSelecionado = usuarioController.buscarUsuario(emailOriginal);
+                } else {
+                    usuarioSelecionado = usuarioController.buscarUsuario(novoEmail);
+                }
+
+                atualizarTabelaUsuarios();
+                atualizarTabelaBiblioteca();
+
+            } catch (IllegalArgumentException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Erro de Validação", JOptionPane.WARNING_MESSAGE);
+            }
         }
     }
 
@@ -242,7 +252,9 @@ public class PainelUsuarios extends JPanel {
         }
 
         String titulo = JOptionPane.showInputDialog(this, "Digite o título da Mídia (da Loja) para adicionar:");
+
         if (titulo == null || titulo.isBlank()) return;
+        titulo = titulo.trim();
 
         Midia midia = jogoController.buscarJogo(titulo);
         if (midia == null) {
@@ -252,9 +264,15 @@ public class PainelUsuarios extends JPanel {
         if (midia == null) {
             JOptionPane.showMessageDialog(this, "Mídia não encontrada na Loja.", "Erro", JOptionPane.ERROR_MESSAGE);
         } else {
-            usuarioController.adicionarMidiaAoUsuario(usuarioSelecionado.getEmail(), midia);
-            atualizarTabelaBiblioteca();
-            atualizarTabelaUsuarios();
+            boolean sucesso = usuarioController.adicionarMidiaAoUsuario(usuarioSelecionado.getEmail(), midia);
+
+            if (sucesso) {
+                JOptionPane.showMessageDialog(this, "Mídia adicionada com sucesso!");
+                atualizarTabelaBiblioteca();
+                atualizarTabelaUsuarios();
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro: Não foi possível adicionar (talvez já possua).", "Aviso", JOptionPane.WARNING_MESSAGE);
+            }
         }
     }
 

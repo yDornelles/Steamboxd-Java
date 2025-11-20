@@ -59,14 +59,30 @@ public class PainelDLCs extends JPanel {
         tableModel.setRowCount(0);
         List<DLC> dlcs = dlcController.listarDLCs();
         for (DLC dlc : dlcs) {
-            String generos = String.join(", ", dlc.getGeneros());
-            String plataformas = String.join(", ", dlc.getPlataformas());
+            List<String> listaGeneros = dlc.getGeneros();
+            String generos = listaGeneros.isEmpty() ? "N/A" : String.join(", ", listaGeneros);
+
+            List<String> listaPlataformas = dlc.getPlataformas();
+            String plataformas = listaPlataformas.isEmpty() ? "N/A" : String.join(", ", listaPlataformas);
+
+            Object anoExibicao = (dlc.getAnoLancamento() == 0) ? "N/A" : dlc.getAnoLancamento();
+
+            Object precoExibicao;
+            if (dlc.getPreco() == 0.0) {
+                precoExibicao = "Grátis";
+            } else {
+                precoExibicao = String.format("R$ %.2f", dlc.getPreco());
+            }
+
+            String jogoBaseExibicao = (dlc.getJogoBaseTitulo() == null || dlc.getJogoBaseTitulo().isBlank())
+                    ? "N/A"
+                    : dlc.getJogoBaseTitulo();
 
             tableModel.addRow(new Object[]{
                     dlc.getTitulo(),
-                    dlc.getJogoBaseTitulo(),
-                    dlc.getAnoLancamento(),
-                    dlc.getPreco(),
+                    jogoBaseExibicao,
+                    anoExibicao,
+                    precoExibicao,
                     dlc.isExpansao() ? "Sim" : "Não",
                     generos,
                     plataformas
@@ -157,25 +173,42 @@ public class PainelDLCs extends JPanel {
             JTextField txtPreco = (JTextField) campos[5];
             JCheckBox chkExpansao = (JCheckBox) campos[6];
 
+            int ano = 0;
+            if (!txtAno.getText().isBlank()) {
+                ano = Integer.parseInt(txtAno.getText());
+            }
+
+            String precoTxt = txtPreco.getText().replace(',', '.').trim();
+            double preco = 0.0;
+            if (!precoTxt.isEmpty()) {
+                preco = Double.parseDouble(precoTxt);
+            }
+
             try {
                 List<String> generos = Arrays.stream(txtGeneros.getText().split(","))
-                        .map(String::trim).collect(Collectors.toList());
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
                 List<String> plataformas = Arrays.stream(txtPlataformas.getText().split(","))
-                        .map(String::trim).collect(Collectors.toList());
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
 
                 dlcController.adicionarDLC(
                         txtTitulo.getText(),
                         0.0,
-                        Integer.parseInt(txtAno.getText()),
+                        ano,
                         generos,
                         plataformas,
                         txtJogoBase.getText(),
                         chkExpansao.isSelected(),
-                        Double.parseDouble(txtPreco.getText())
+                        preco
                 );
                 atualizarTabela();
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Erro: Ano e Preço devem ser números.", "Erro de Formato", JOptionPane.ERROR_MESSAGE);
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Validação", JOptionPane.WARNING_MESSAGE);
             }
         }
     }
@@ -200,27 +233,48 @@ public class PainelDLCs extends JPanel {
         try {
             switch (escolha) {
                 case 0: // Editar Preço
-                    String novoPrecoStr = JOptionPane.showInputDialog(this, "Novo Preço:", dlc.getPreco());
+                    String novoPrecoStr = JOptionPane.showInputDialog(this, "Novo Preço (Vazio = Grátis):", dlc.getPreco());
                     if (novoPrecoStr != null) {
-                        sucesso = dlcController.editarPreco(titulo, Double.parseDouble(novoPrecoStr));
+                        String precoTratado = novoPrecoStr.replace(",", ".").trim();
+                        double novoPreco = 0.0;
+                        if (!precoTratado.isEmpty()) {
+                            novoPreco = Double.parseDouble(precoTratado);
+                        }
+                        sucesso = dlcController.editarPreco(titulo, novoPreco);
                     }
                     break;
                 case 1: // Editar Ano
-                    String novoAnoStr = JOptionPane.showInputDialog(this, "Novo Ano:", dlc.getAnoLancamento());
+                    String valorAtual = (dlc.getAnoLancamento() == 0) ? "" : String.valueOf(dlc.getAnoLancamento());
+                    String novoAnoStr = JOptionPane.showInputDialog(this, "Novo Ano:", valorAtual);
+
                     if (novoAnoStr != null) {
-                        sucesso = dlcController.editarAno(titulo, Integer.parseInt(novoAnoStr));
+                        int novoAno = 0;
+                        if (!novoAnoStr.isBlank()) {
+                            novoAno = Integer.parseInt(novoAnoStr);
+                        }
+                        sucesso = dlcController.editarAno(titulo, novoAno);
                     }
                     break;
                 case 2: // Adicionar Gênero
                     String novoGenero = JOptionPane.showInputDialog(this, "Adicionar Gênero:");
                     if (novoGenero != null && !novoGenero.isBlank()) {
-                        sucesso = dlcController.adicionarGenero(titulo, novoGenero);
+                        String[] lista = novoGenero.split(",");
+                        for (String p : lista) {
+                            if (!p.trim().isEmpty()) {
+                                sucesso = dlcController.adicionarGenero(titulo, p.trim());
+                            }
+                        }
                     }
                     break;
                 case 3: // Adicionar Plataforma
                     String novaPlataforma = JOptionPane.showInputDialog(this, "Adicionar Plataforma:");
                     if (novaPlataforma != null && !novaPlataforma.isBlank()) {
-                        sucesso = dlcController.adicionarPlataforma(titulo, novaPlataforma);
+                        String[] lista = novaPlataforma.split(",");
+                        for (String p : lista) {
+                            if (!p.trim().isEmpty()) {
+                                sucesso = dlcController.adicionarPlataforma(titulo, p.trim());
+                            }
+                        }
                     }
                     break;
                 case 4: // Cancelar
@@ -232,10 +286,12 @@ public class PainelDLCs extends JPanel {
                 JOptionPane.showMessageDialog(this, "Alteração realizada com sucesso!");
                 atualizarTabela();
             } else {
-                JOptionPane.showMessageDialog(this, "Falha ao realizar alteração.", "Erro", JOptionPane.ERROR_MESSAGE);
+                atualizarTabela();
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Valor numérico inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Validação", JOptionPane.ERROR_MESSAGE);
         }
     }
 

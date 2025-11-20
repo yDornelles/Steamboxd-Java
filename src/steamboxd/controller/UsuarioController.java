@@ -48,8 +48,8 @@ public class UsuarioController {
 
     // --- Gerenciamento da Biblioteca do Usuário ---
 
-    public void adicionarMidiaAoUsuario(String emailUsuario, Midia midia) {
-        usuarioService.adicionarMidia(emailUsuario, midia);
+    public boolean adicionarMidiaAoUsuario(String emailUsuario, Midia midia) {
+        return usuarioService.adicionarMidia(emailUsuario, midia);
     }
 
     public boolean removerMidiaDoUsuario(String emailUsuario, String tituloMidia) {

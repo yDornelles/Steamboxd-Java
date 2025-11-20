@@ -24,6 +24,25 @@ public class DLCService implements MidiaService<DLC> {
 
     @Override
     public void adicionar(DLC dlc) {
+        if (dlc.getTitulo() != null) {
+            dlc.setTitulo(dlc.getTitulo().trim());
+        }
+        if (dlc.getJogoBaseTitulo() != null) {
+            dlc.setJogoBaseTitulo(dlc.getJogoBaseTitulo().trim());
+        }
+        if (dlc.getTitulo() == null || dlc.getTitulo().isBlank()) {
+            throw new IllegalArgumentException("O título da DLC é obrigatório.");
+        }
+        if (dlc.getAnoLancamento() > 2025) {
+            throw new IllegalArgumentException("O ano de lançamento deve ser válido (até 2025).");
+        }
+        if (dlc.getAnoLancamento() != 0 && dlc.getAnoLancamento() < 1950) {
+            throw new IllegalArgumentException("Ano inválido (muito antigo).");
+        }
+        if (dlc.getPreco() < 0) {
+            throw new IllegalArgumentException("O preço não pode ser negativo.");
+        }
+
         repository.adicionar(dlc);
 
         String jogoTitulo = dlc.getJogoBaseTitulo();
@@ -58,6 +77,7 @@ public class DLCService implements MidiaService<DLC> {
                     jogo.setDlcTitulos(dlcTitulos);
                 }
             }
+            Sistema.getInstance().getUsuarioRepository().removerMidiaDeTodos(titulo);
         }
         return removido;
     }
@@ -84,6 +104,13 @@ public class DLCService implements MidiaService<DLC> {
 
     @Override
     public boolean editarAno(String titulo, int novoAno) {
+        if (novoAno > 2025) {
+            throw new IllegalArgumentException("O ano de lançamento deve ser válido (até 2025).");
+        }
+        if (novoAno != 0 && novoAno < 1950) {
+            throw new IllegalArgumentException("Ano inválido (muito antigo).");
+        }
+
         DLC dlc = repository.buscar(titulo);
         if (dlc != null) {
             dlc.setAnoLancamento(novoAno);
@@ -94,6 +121,10 @@ public class DLCService implements MidiaService<DLC> {
 
     @Override
     public boolean editarPreco(String titulo, double novoPreco) {
+        if (novoPreco < 0) {
+            throw new IllegalArgumentException("O preço não pode ser negativo.");
+        }
+
         DLC dlc = repository.buscar(titulo);
         if (dlc != null) {
             dlc.setPreco(novoPreco);
@@ -104,6 +135,9 @@ public class DLCService implements MidiaService<DLC> {
 
     @Override
     public boolean adicionarGenero(String titulo, String genero) {
+        if (genero != null) {
+            genero = genero.trim();
+        }
         if (genero == null || genero.isBlank()) {
             return false;
         }
@@ -119,6 +153,9 @@ public class DLCService implements MidiaService<DLC> {
 
     @Override
     public boolean adicionarPlataforma(String titulo, String plataforma) {
+        if (plataforma != null) {
+            plataforma = plataforma.trim();
+        }
         if (plataforma == null || plataforma.isBlank()) {
             return false;
         }

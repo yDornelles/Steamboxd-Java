@@ -20,12 +20,35 @@ public class JogoService implements MidiaService<Jogo> {
 
     @Override
     public void adicionar(Jogo jogo) {
+        if (jogo.getTitulo() != null) {
+            jogo.setTitulo(jogo.getTitulo().trim());
+        }
+        if (jogo.getDesenvolvedora() != null) {
+            jogo.setDesenvolvedora(jogo.getDesenvolvedora().trim());
+        }
+        if (jogo.getTitulo() == null || jogo.getTitulo().isBlank()) {
+            throw new IllegalArgumentException("O título do jogo é obrigatório.");
+        }
+        if (jogo.getAnoLancamento() > 2025) {
+            throw new IllegalArgumentException("O ano de lançamento deve ser válido (até 2025).");
+        }
+        if (jogo.getAnoLancamento() != 0 && jogo.getAnoLancamento() < 1950) {
+            throw new IllegalArgumentException("Ano inválido (muito antigo).");
+        }
+        if (jogo.getPreco() < 0) {
+            throw new IllegalArgumentException("O preço não pode ser negativo.");
+        }
         repository.adicionar(jogo);
     }
 
     @Override
     public boolean remover(String titulo) {
-        return repository.remover(titulo);
+        boolean removido = repository.remover(titulo);
+
+        if (removido) {
+            Sistema.getInstance().getUsuarioRepository().removerMidiaDeTodos(titulo);
+        }
+        return removido;
     }
 
     @Override
@@ -50,6 +73,13 @@ public class JogoService implements MidiaService<Jogo> {
 
     @Override
     public boolean editarAno(String titulo, int novoAno) {
+        if (novoAno > 2025) {
+            throw new IllegalArgumentException("O ano de lançamento deve ser válido (até 2025).");
+        }
+        if (novoAno != 0 && novoAno < 1950) {
+            throw new IllegalArgumentException("Ano inválido (muito antigo).");
+        }
+
         Jogo jogo = repository.buscar(titulo);
         if (jogo != null) {
             jogo.setAnoLancamento(novoAno);
@@ -60,6 +90,10 @@ public class JogoService implements MidiaService<Jogo> {
 
     @Override
     public boolean editarPreco(String titulo, double novoPreco) {
+        if (novoPreco < 0) {
+            throw new IllegalArgumentException("O preço não pode ser negativo.");
+        }
+
         Jogo jogo = repository.buscar(titulo);
         if (jogo != null) {
             jogo.setPreco(novoPreco);
@@ -70,6 +104,9 @@ public class JogoService implements MidiaService<Jogo> {
 
     @Override
     public boolean adicionarGenero(String titulo, String genero) {
+        if (genero != null) {
+            genero = genero.trim();
+        }
         if (genero == null || genero.isBlank()) {
             return false;
         }
@@ -85,6 +122,9 @@ public class JogoService implements MidiaService<Jogo> {
 
     @Override
     public boolean adicionarPlataforma(String titulo, String plataforma) {
+        if (plataforma != null) {
+            plataforma = plataforma.trim();
+        }
         if (plataforma == null || plataforma.isBlank()) {
             return false;
         }

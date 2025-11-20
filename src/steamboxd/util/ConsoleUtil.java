@@ -75,22 +75,52 @@ public class ConsoleUtil {
     }
 
     /**
-     * Lê um número decimal, com tratamento de erro.
-     * <p>O método fica em loop até que um número válido seja digitado.</p>
+     * Lê um número inteiro, mas permite deixar em branco (Enter).
+     * Se deixar em branco, retorna o valor padrão.
      *
      * @param mensagem O prompt a ser exibido.
-     * @return O double lido.
+     * @param valorPadrao O valor a retornar se for vazio.
+     * @return O inteiro lido ou o padrão.
      */
-    public static double lerDouble(String mensagem) {
+    public static int lerIntOpcional(String mensagem, int valorPadrao) {
         while (true) {
+            System.out.print(mensagem);
+            String input = scanner.nextLine().trim();
+
+            if (input.isEmpty()) {
+                return valorPadrao;
+            }
+
             try {
-                System.out.print(mensagem);
-                double valor = scanner.nextDouble();
-                limparBuffer();
-                return valor;
-            } catch (InputMismatchException e) {
-                System.out.println("Erro: Valor inválido. Digite um número decimal.");
-                limparBuffer();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Erro: Valor inválido. Digite um número inteiro ou deixe em branco.");
+            }
+        }
+    }
+
+    /**
+     * Lê um número decimal, mas permite deixar em branco.
+     * Aceita tanto ponto (29.90) quanto vírgula (29,90).
+     *
+     * @param mensagem O prompt a ser exibido.
+     * @param valorPadrao O valor a retornar se for vazio.
+     * @return O double lido ou o padrão.
+     */
+    public static double lerDoubleOpcional(String mensagem, double valorPadrao) {
+        while (true) {
+            System.out.print(mensagem);
+            String input = scanner.nextLine().trim();
+
+            if (input.isEmpty()) {
+                return valorPadrao;
+            }
+
+            try {
+                // Substitui vírgula por ponto para garantir que o Java entenda
+                return Double.parseDouble(input.replace(',', '.'));
+            } catch (NumberFormatException e) {
+                System.out.println("Erro: Valor inválido. Digite um número decimal ou deixe em branco.");
             }
         }
     }

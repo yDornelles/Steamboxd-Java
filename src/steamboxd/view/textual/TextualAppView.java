@@ -134,16 +134,20 @@ public class TextualAppView implements IAppView {
      */
     private void adicionarJogo() {
         System.out.println("\n-> Adicionar Novo Jogo");
-        String titulo = ConsoleUtil.lerString("Título: ");
-        int ano = ConsoleUtil.lerInt("Ano de Lançamento: ");
+        String titulo = ConsoleUtil.lerString("Título: ").trim();
+        int ano = ConsoleUtil.lerIntOpcional("Ano de Lançamento: ", 0);
         List<String> generos = ConsoleUtil.lerListaStrings("Gêneros: ");
         List<String> plataformas = ConsoleUtil.lerListaStrings("Plataformas: ");
-        String dev = ConsoleUtil.lerString("Desenvolvedora: ");
-        double preco = ConsoleUtil.lerDouble("Preço: ");
+        String dev = ConsoleUtil.lerString("Desenvolvedora: ").trim();
+        double preco = ConsoleUtil.lerDoubleOpcional("Preço (Enter para Grátis): ", 0.0);
         boolean multi = ConsoleUtil.lerBoolean("Tem multiplayer (s/n): ");
 
-        jogoController.adicionarJogo(titulo, 0.0, ano, generos, plataformas, dev, multi, preco);
-        System.out.println("\nJogo '" + titulo + "' adicionado com sucesso!");
+        try {
+            jogoController.adicionarJogo(titulo, 0.0, ano, generos, plataformas, dev, multi, preco);
+            System.out.println("\nJogo '" + titulo.trim() + "' adicionado com sucesso!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("\nErro de Validação: " + e.getMessage());
+        }
     }
 
     /**
@@ -159,12 +163,26 @@ public class TextualAppView implements IAppView {
         }
 
         for (var jogo : jogos) {
+            String anoStr = (jogo.getAnoLancamento() == 0) ? "N/A" : String.valueOf(jogo.getAnoLancamento());
+
+            String precoStr;
+            if (jogo.getPreco() == 0.0) {
+                precoStr = "Grátis";
+            } else {
+                precoStr = String.format("R$ %.2f", jogo.getPreco());
+            }
+
             System.out.println("--------------------");
-            System.out.println("Título: " + jogo.getTitulo() + " (" + jogo.getAnoLancamento() + ")");
-            System.out.println("Preço: R$ " + jogo.getPreco());
-            System.out.println("Desenvolvedora: " + (jogo.getDesenvolvedora().isEmpty() ? "Desconhecida" : jogo.getDesenvolvedora()));
-            System.out.println("Gêneros: " + String.join(", ", jogo.getGeneros()));
-            System.out.println("Plataformas: " + String.join(", ", jogo.getPlataformas()));
+            System.out.println("Título: " + jogo.getTitulo() + " (" + anoStr + ")");
+            System.out.println("Preço: " + precoStr);
+            System.out.println("Desenvolvedora: " + (jogo.getDesenvolvedora().isEmpty() ? "N/A" : jogo.getDesenvolvedora()));
+
+            String generosStr = jogo.getGeneros().isEmpty() ? "N/A" : String.join(", ", jogo.getGeneros());
+            System.out.println("Gêneros: " + generosStr);
+
+            String platStr = jogo.getPlataformas().isEmpty() ? "N/A" : String.join(", ", jogo.getPlataformas());
+            System.out.println("Plataformas: " + platStr);
+
             System.out.println("Multiplayer: " + (jogo.isMultiplayer() ? "Sim" : "Não"));
             System.out.println("DLCs cadastradas: " + jogo.getDlcTitulos().size());
         }
@@ -199,34 +217,39 @@ public class TextualAppView implements IAppView {
             int opcao = ConsoleUtil.lerInt("Opção: ");
             boolean sucesso = false;
 
-            switch (opcao) {
-                case 1:
-                    double novoPreco = ConsoleUtil.lerDouble("Novo Preço: ");
-                    sucesso = jogoController.editarPreco(titulo, novoPreco);
-                    break;
-                case 2:
-                    int novoAno = ConsoleUtil.lerInt("Novo Ano: ");
-                    sucesso = jogoController.editarAno(titulo, novoAno);
-                    break;
-                case 3:
-                    String genero = ConsoleUtil.lerString("Novo Gênero: ");
-                    sucesso = jogoController.adicionarGenero(titulo, genero);
-                    break;
-                case 4:
-                    String plataforma = ConsoleUtil.lerString("Nova Plataforma: ");
-                    sucesso = jogoController.adicionarPlataforma(titulo, plataforma);
-                    break;
-                case 0:
-                    editando = false;
-                    continue;
-                default:
-                    System.out.println("Opção inválida.");
-            }
+            try {
+                switch (opcao) {
+                    case 1:
+                        double novoPreco = ConsoleUtil.lerDoubleOpcional("Novo Preço (Enter para Grátis): ", 0.0);
+                        sucesso = jogoController.editarPreco(titulo, novoPreco);
+                        break;
+                    case 2:
+                        int novoAno = ConsoleUtil.lerIntOpcional("Novo Ano: ", 0);
+                        sucesso = jogoController.editarAno(titulo, novoAno);
+                        break;
+                    case 3:
+                        String genero = ConsoleUtil.lerString("Novo Gênero: ").trim();
+                        sucesso = jogoController.adicionarGenero(titulo, genero);
+                        break;
+                    case 4:
+                        String plataforma = ConsoleUtil.lerString("Nova Plataforma: ").trim();
+                        sucesso = jogoController.adicionarPlataforma(titulo, plataforma);
+                        break;
+                    case 0:
+                        editando = false;
+                        continue;
+                    default:
+                        System.out.println("Opção inválida.");
+                }
 
-            if (sucesso) {
-                System.out.println("\nAlteração realizada com sucesso!");
-            } else {
-                System.out.println("\nFalha ao realizar alteração.");
+                if (sucesso) {
+                    System.out.println("\nAlteração realizada com sucesso!");
+                } else if (editando) {
+                    System.out.println("\nFalha ao realizar alteração (verifique os dados).");
+                }
+
+            } catch (IllegalArgumentException e) {
+                System.out.println("\nErro de Validação: " + e.getMessage());
             }
         }
     }
@@ -291,16 +314,20 @@ public class TextualAppView implements IAppView {
      */
     private void adicionarDLC() {
         System.out.println("\n-> Adicionar Nova DLC");
-        String titulo = ConsoleUtil.lerString("Título: ");
-        String jogoBaseTitulo = ConsoleUtil.lerString("Título do Jogo Base: ");
-        int ano = ConsoleUtil.lerInt("Ano de Lançamento: ");
+        String titulo = ConsoleUtil.lerString("Título: ").trim();
+        String jogoBaseTitulo = ConsoleUtil.lerString("Título do Jogo Base: ").trim();
+        int ano = ConsoleUtil.lerIntOpcional("Ano de Lançamento: ", 0);
         List<String> generos = ConsoleUtil.lerListaStrings("Gêneros: ");
         List<String> plataformas = ConsoleUtil.lerListaStrings("Plataformas: ");
-        double preco = ConsoleUtil.lerDouble("Preço: ");
+        double preco = ConsoleUtil.lerDoubleOpcional("Preço (Enter para Grátis): ", 0.0);
         boolean ex = ConsoleUtil.lerBoolean("Tem expansão (s/n): ");
 
-        dlcController.adicionarDLC(titulo, 0.0, ano, generos, plataformas, jogoBaseTitulo, ex, preco);
-        System.out.println("DLC '" + titulo + "' adicionada com sucesso!");
+        try {
+            dlcController.adicionarDLC(titulo, 0.0, ano, generos, plataformas, jogoBaseTitulo, ex, preco);
+            System.out.println("DLC '" + titulo + "' adicionada com sucesso!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("\nErro de Validação: " + e.getMessage());
+        }
     }
 
     /**
@@ -316,13 +343,27 @@ public class TextualAppView implements IAppView {
         }
 
         for (var dlc : dlcs) {
+            String anoStr = (dlc.getAnoLancamento() == 0) ? "N/A" : String.valueOf(dlc.getAnoLancamento());
+
+            String precoStr;
+            if (dlc.getPreco() == 0.0) {
+                precoStr = "Grátis";
+            } else {
+                precoStr = String.format("R$ %.2f", dlc.getPreco());
+            }
+
             System.out.println("--------------------");
-            System.out.println("Título: " + dlc.getTitulo() + " (" + dlc.getAnoLancamento() + ")");
-            System.out.println("Jogo Base: " + dlc.getJogoBaseTitulo());
-            System.out.println("Preço: R$ " + dlc.getPreco());
-            System.out.println("Gêneros: " + String.join(", ", dlc.getGeneros()));
-            System.out.println("Plataformas: " + String.join(", ", dlc.getPlataformas()));
-            System.out.println("Expansão: " + (dlc.isExpansao() ? "Sim" : "DLC simples"));
+            System.out.println("Título: " + dlc.getTitulo() + " (" + anoStr + ")");
+            System.out.println("Jogo Base: " + (dlc.getJogoBaseTitulo().isEmpty() ? "N/A" : dlc.getJogoBaseTitulo()));
+            System.out.println("Preço: " + precoStr);
+
+            String generosStr = dlc.getGeneros().isEmpty() ? "N/A" : String.join(", ", dlc.getGeneros());
+            System.out.println("Gêneros: " + generosStr);
+
+            String platStr = dlc.getPlataformas().isEmpty() ? "N/A" : String.join(", ", dlc.getPlataformas());
+            System.out.println("Plataformas: " + platStr);
+
+            System.out.println("Expansão: " + (dlc.isExpansao() ? "Sim" : "Não"));
         }
         System.out.println("--------------------");
     }
@@ -355,34 +396,39 @@ public class TextualAppView implements IAppView {
             int opcao = ConsoleUtil.lerInt("Opção: ");
             boolean sucesso = false;
 
-            switch (opcao) {
-                case 1:
-                    double novoPreco = ConsoleUtil.lerDouble("Novo Preço: ");
-                    sucesso = dlcController.editarPreco(titulo, novoPreco);
-                    break;
-                case 2:
-                    int novoAno = ConsoleUtil.lerInt("Novo Ano: ");
-                    sucesso = dlcController.editarAno(titulo, novoAno);
-                    break;
-                case 3:
-                    String genero = ConsoleUtil.lerString("Novo Gênero: ");
-                    sucesso = dlcController.adicionarGenero(titulo, genero);
-                    break;
-                case 4:
-                    String plataforma = ConsoleUtil.lerString("Nova Plataforma: ");
-                    sucesso = dlcController.adicionarPlataforma(titulo, plataforma);
-                    break;
-                case 0:
-                    editando = false;
-                    continue;
-                default:
-                    System.out.println("Opção inválida.");
-            }
+            try {
+                switch (opcao) {
+                    case 1:
+                        double novoPreco = ConsoleUtil.lerDoubleOpcional("Novo Preço (Enter para Grátis): ", 0.0);
+                        sucesso = dlcController.editarPreco(titulo, novoPreco);
+                        break;
+                    case 2:
+                        int novoAno = ConsoleUtil.lerIntOpcional("Novo Ano: ", 0);
+                        sucesso = dlcController.editarAno(titulo, novoAno);
+                        break;
+                    case 3:
+                        String genero = ConsoleUtil.lerString("Novo Gênero: ").trim();
+                        sucesso = dlcController.adicionarGenero(titulo, genero);
+                        break;
+                    case 4:
+                        String plataforma = ConsoleUtil.lerString("Nova Plataforma: ").trim();
+                        sucesso = dlcController.adicionarPlataforma(titulo, plataforma);
+                        break;
+                    case 0:
+                        editando = false;
+                        continue;
+                    default:
+                        System.out.println("Opção inválida.");
+                }
 
-            if (sucesso) {
-                System.out.println("\nAlteração realizada com sucesso!");
-            } else {
-                System.out.println("\nFalha ao realizar alteração.");
+                if (sucesso) {
+                    System.out.println("\nAlteração realizada com sucesso!");
+                } else if (editando) {
+                    System.out.println("\nFalha ao realizar alteração.");
+                }
+
+            } catch (IllegalArgumentException e) {
+                System.out.println("\nErro de Validação: " + e.getMessage());
             }
         }
     }
@@ -451,18 +497,21 @@ public class TextualAppView implements IAppView {
      */
     private void criarUsuario() {
         System.out.println("\n-> Criar Novo Usuário");
-        String nome = ConsoleUtil.lerString("Nome: ");
-        String email = ConsoleUtil.lerString("Email: ");
+        String nome = ConsoleUtil.lerString("Nome: ").trim();
+        String email = ConsoleUtil.lerString("Email: ").trim();
 
-        boolean sucesso = usuarioController.criarUsuario(nome, email);
+        try {
+            boolean sucesso = usuarioController.criarUsuario(nome, email);
 
-        if (sucesso) {
-            System.out.println("Usuário '" + nome + "' criado com sucesso!");
-        } else {
-            System.out.println("\nErro: O email '" + email + "' já está cadastrado.");
+            if (sucesso) {
+                System.out.println("Usuário '" + nome + "' criado com sucesso!");
+            } else {
+                System.out.println("\nErro: O email '" + email + "' já está cadastrado.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("\nErro de Validação: " + e.getMessage());
         }
     }
-
     /**
      * Gerencia o fluxo de interface para listar todos os usuarios cadastrados.
      */
@@ -509,12 +558,16 @@ public class TextualAppView implements IAppView {
             return;
         }
 
-        boolean sucesso = usuarioController.editarUsuario(emailAtual, novoNome, novoEmail);
+        try {
+            boolean sucesso = usuarioController.editarUsuario(emailAtual, novoNome, novoEmail);
 
-        if (sucesso) {
-            System.out.println("Usuário editado com sucesso!");
-        } else {
-            System.out.println("Erro ao editar. O novo email já pode estar cadastrado.");
+            if (sucesso) {
+                System.out.println("Usuário editado com sucesso!");
+            } else {
+                System.out.println("Erro ao editar. O novo email já pode estar cadastrado.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("\nErro de Validação: " + e.getMessage());
         }
     }
 
@@ -606,7 +659,7 @@ public class TextualAppView implements IAppView {
         System.out.println("2. DLC");
 
         int tipo = ConsoleUtil.lerInt("Tipo: ");
-        String titulo = ConsoleUtil.lerString("Digite o título da mídia: ");
+        String titulo = ConsoleUtil.lerString("Digite o título da mídia: ").trim();
 
         Midia midiaParaAdicionar = null;
 
@@ -624,8 +677,13 @@ public class TextualAppView implements IAppView {
             return;
         }
 
-        usuarioController.adicionarMidiaAoUsuario(emailUsuario, midiaParaAdicionar);
-        System.out.println("'" + titulo + "' adicionado(a) à biblioteca!");
+        boolean sucesso = usuarioController.adicionarMidiaAoUsuario(emailUsuario, midiaParaAdicionar);
+
+        if (sucesso) {
+            System.out.println("'" + titulo + "' adicionado(a) à biblioteca!");
+        } else {
+            System.out.println("Erro: Não foi possível adicionar (talvez já esteja na biblioteca).");
+        }
     }
 
     /**
@@ -647,26 +705,44 @@ public class TextualAppView implements IAppView {
             if (midia instanceof Jogo) {
                 var jogo = (Jogo) midia;
 
+                String anoStr = (jogo.getAnoLancamento() == 0) ? "N/A" : String.valueOf(jogo.getAnoLancamento());
+
+                String precoStr;
+                if (jogo.getPreco() == 0.0) {
+                    precoStr = "Grátis";
+                } else {
+                    precoStr = String.format("R$ %.2f", jogo.getPreco());
+                }
+
                 System.out.println("Tipo: Jogo");
-                System.out.println("Título: " + jogo.getTitulo() + " (" + jogo.getAnoLancamento() + ")");
-                System.out.println("Preço: R$ " + jogo.getPreco());
+                System.out.println("Título: " + jogo.getTitulo() + " (" + anoStr + ")");
+                System.out.println("Preço: " + precoStr);
                 System.out.println("Nota: " + jogo.getNota());
-                System.out.println("Desenvolvedora: " + (jogo.getDesenvolvedora().isEmpty() ? "Desconhecida" : jogo.getDesenvolvedora()));
-                System.out.println("Gêneros: " + String.join(", ", jogo.getGeneros()));
-                System.out.println("Plataformas: " + String.join(", ", jogo.getPlataformas()));
+                System.out.println("Desenvolvedora: " + (jogo.getDesenvolvedora().isEmpty() ? "N/A" : jogo.getDesenvolvedora()));
+                System.out.println("Gêneros: " + (jogo.getGeneros().isEmpty() ? "N/A" : String.join(", ", jogo.getGeneros())));
+                System.out.println("Plataformas: " + (jogo.getPlataformas().isEmpty() ? "N/A" : String.join(", ", jogo.getPlataformas())));
                 System.out.println("Multiplayer: " + (jogo.isMultiplayer() ? "Sim" : "Não"));
 
             } else if (midia instanceof DLC) {
                 var dlc = (DLC) midia;
 
+                String anoStr = (dlc.getAnoLancamento() == 0) ? "N/A" : String.valueOf(dlc.getAnoLancamento());
+
+                String precoStr;
+                if (dlc.getPreco() == 0.0) {
+                    precoStr = "Grátis";
+                } else {
+                    precoStr = String.format("R$ %.2f", dlc.getPreco());
+                }
+
                 System.out.println("Tipo: DLC");
-                System.out.println("Título: " + dlc.getTitulo() + " (" + dlc.getAnoLancamento() + ")");
+                System.out.println("Título: " + dlc.getTitulo() + " (" + anoStr + ")");
                 System.out.println("Jogo Base: " + dlc.getJogoBaseTitulo());
-                System.out.println("Preço: R$ " + dlc.getPreco());
+                System.out.println("Preço: R$ " + precoStr);
                 System.out.println("Nota: " + dlc.getNota());
-                System.out.println("Gêneros: " + String.join(", ", dlc.getGeneros()));
-                System.out.println("Plataformas: " + String.join(", ", dlc.getPlataformas()));
-                System.out.println("Expansão: " + (dlc.isExpansao() ? "Sim" : "DLC simples"));
+                System.out.println("Gêneros: " + (dlc.getGeneros().isEmpty() ? "N/A" : String.join(", ", dlc.getGeneros())));
+                System.out.println("Plataformas: " + (dlc.getPlataformas().isEmpty() ? "N/A" : String.join(", ", dlc.getPlataformas())));
+                System.out.println("Expansão: " + (dlc.isExpansao() ? "Sim" : "Não"));
 
             } else {
                 System.out.println("Tipo: Mídia Desconhecida");
@@ -681,7 +757,7 @@ public class TextualAppView implements IAppView {
      */
     private void editarMidiaDaBiblioteca(String emailUsuario) {
         System.out.println("\n-> Editar Mídia da Biblioteca");
-        String titulo = ConsoleUtil.lerString("Digite o título da mídia a editar: ");
+        String titulo = ConsoleUtil.lerString("Digite o título da mídia a editar: ").trim();
 
         var midia = usuarioController.buscarMidiaDoUsuario(emailUsuario, titulo);
         if (midia == null) {
@@ -694,7 +770,7 @@ public class TextualAppView implements IAppView {
 
         boolean sucesso = false;
 
-        double novaNota = ConsoleUtil.lerDouble("Nova Nota (0.0 a 10.0): ");
+        double novaNota = ConsoleUtil.lerDoubleOpcional("Nova Nota: ", 0);
         sucesso = usuarioController.editarMidiaDoUsuario(emailUsuario, titulo, novaNota);
 
         if (sucesso) {
@@ -710,7 +786,7 @@ public class TextualAppView implements IAppView {
      */
     private void removerMidiaDaBiblioteca(String emailUsuario) {
         System.out.println("\n-> Remover Mídia da Biblioteca");
-        String titulo = ConsoleUtil.lerString("Digite o título da mídia a remover: ");
+        String titulo = ConsoleUtil.lerString("Digite o título da mídia a remover: ").trim();
 
         boolean confirma = ConsoleUtil.lerBoolean("Tem certeza (s/n)? ");
         if (confirma) {
