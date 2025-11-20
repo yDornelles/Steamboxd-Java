@@ -32,6 +32,9 @@ public class UsuarioService {
         if (usuario.getNome() == null || usuario.getNome().isBlank()) {
             throw new IllegalArgumentException("O nome do usuário é obrigatório.");
         }
+        if (usuario.getNome().matches(".*\\d.*")) {
+            throw new IllegalArgumentException("O nome do usuário não pode conter números.");
+        }
         if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
             throw new IllegalArgumentException("O email do usuário é obrigatório.");
         }
@@ -71,6 +74,9 @@ public class UsuarioService {
             novoNome = novoNome.trim();
             if (novoNome.isBlank()) {
                 throw new IllegalArgumentException("O novo nome não pode ser vazio.");
+            }
+            if (novoNome.matches(".*\\d.*")) {
+                throw new IllegalArgumentException("O nome do usuário não pode conter números.");
             }
             user.setNome(novoNome);
         }
