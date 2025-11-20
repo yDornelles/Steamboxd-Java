@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Interface genérica que define o contrato da camada de Serviço
- * para qualquer entidade do tipo {@link steamboxd.model.Midia}.
+ * para qualquer entidade do tipo {@link main.java.steamboxd.model.Midia}.
  *
  * <p>Esta interface abstrai a lógica de negócio. Ela garante que todos
  * os serviços forneçam as mesmas operações básicas, permitindo que os Controllers interajam

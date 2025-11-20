@@ -93,13 +93,13 @@ Isso foi resolvido com um `RuntimeTypeAdapterFactory` (uma ferramenta padrão do
 ## Como Executar
 
 1.  Clone o repositório.
-2.  Abra o projeto na sua IDE (ex: IntelliJ).
-3.  **Dependência:** O projeto já está configurado para o IntelliJ e inclui a biblioteca Gson (`.jar`) na pasta `lib`. A dependência deve ser reconhecida automaticamente ao abrir o projeto.
-4.  **Para escolher a interface:**
-    * Abra o arquivo: `src/steamboxd/view/FabricaDeInterfaces.java`
+2.  Abra a pasta do projeto na sua IDE (ex: IntelliJ IDEA).
+    * O IntelliJ detectará automaticamente o arquivo `pom.xml` e baixará as dependências (Gson).
+3.  **Para escolher a interface:**
+    * Abra o arquivo: `src/main/java/steamboxd/view/FabricaDeInterfaces.java`
     * Mude a constante estática `TIPO_ATUAL` para:
         * `TipoInterface.GRAFICA` (para a interface Swing)
         * `TipoInterface.TEXTUAL` (para a interface de console)
-5.  **Execute o projeto:**
-    * Encontre o arquivo `Main.java` (localizado na pasta `src/`, fora de qualquer pacote).
+4.  **Execute o projeto:**
+    * Encontre o arquivo `src/main/java/Main.java`.
     * Clique com o botão direito e selecione **Run 'Main.main()'**.
