@@ -89,7 +89,11 @@ public class Jogo extends Midia {
     }
 
     public void setDlcTitulos(List<String> dlcTitulos) {
-        this.dlcTitulos = new ArrayList<>(dlcTitulos);
+        if (dlcTitulos == null) {
+            this.dlcTitulos = new ArrayList<>();
+        } else {
+            this.dlcTitulos = new ArrayList<>(dlcTitulos);
+        }
     }
 
     public String getDesenvolvedora() {
@@ -97,7 +101,11 @@ public class Jogo extends Midia {
     }
 
     public void setDesenvolvedora(String desenvolvedora) {
-        this.desenvolvedora = desenvolvedora;
+        if (desenvolvedora == null) {
+            this.desenvolvedora = "";
+        } else {
+            this.desenvolvedora = desenvolvedora.trim();
+        }
     }
 
     public boolean isMultiplayer() {
@@ -108,11 +116,16 @@ public class Jogo extends Midia {
         this.multiplayer = multiplayer;
     }
 
+    @Override
     public double getPreco() {
         return preco;
     }
 
+    @Override
     public void setPreco(double preco) {
+        if (preco < 0) {
+            throw new IllegalArgumentException("O preço não pode ser negativo.");
+        }
         this.preco = preco;
     }
 

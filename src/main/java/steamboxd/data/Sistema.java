@@ -1,7 +1,7 @@
 package steamboxd.data;
 
 import steamboxd.data.dao.PersistenciaDAO;
-import steamboxd.data.dao.JsonDAO;
+import steamboxd.data.dao.TxtDAO;
 import steamboxd.repository.DLCRepository;
 import steamboxd.repository.JogoRepository;
 import steamboxd.repository.UsuarioRepository;
@@ -22,7 +22,7 @@ public class Sistema {
     private final UsuarioRepository usuarioRepository;
 
     private final PersistenciaDAO dao;
-    private final String NOME_ARQUIVO = "steamboxd.json";
+    private String arquivoAtual = "steamboxd.txt";
 
     /**
      * Construtor privado para impedir a criação de novas instâncias
@@ -32,7 +32,7 @@ public class Sistema {
         this.jogoRepository = new JogoRepository();
         this.dlcRepository = new DLCRepository();
         this.usuarioRepository = new UsuarioRepository();
-        this.dao = new JsonDAO();
+        this.dao = new TxtDAO();
     }
 
     /**
@@ -48,6 +48,10 @@ public class Sistema {
 
     // --- MÉTODOS DE PERSISTÊNCIA ---
 
+    public void setArquivoAtual(String caminho) {
+        this.arquivoAtual = caminho;
+    }
+
     /**
      * Coleta todos os dados dos repositórios,
      * empacota e solicita ao DAO para salvar.
@@ -59,8 +63,8 @@ public class Sistema {
                     dlcRepository.listarTodos(),
                     usuarioRepository.listarTodos()
             );
-            dao.salvar(dados, NOME_ARQUIVO);
-            System.out.println("Dados salvos com sucesso em " + NOME_ARQUIVO);
+            dao.salvar(dados, arquivoAtual);
+            System.out.println("Dados salvos com sucesso em " + arquivoAtual);
 
         } catch (Exception e) {
             System.err.println("Erro ao salvar dados: " + e.getMessage());
@@ -69,27 +73,36 @@ public class Sistema {
     }
 
     /**
-     * Solicita ao DAO para carregar os dados
-     * e os distribui para os repositórios.
+     * Usa o arquivo padrão ou o último utilizado.
      */
     public void carregarDados() {
-        File arquivo = new File(NOME_ARQUIVO);
+        carregarDados(this.arquivoAtual);
+    }
+
+    /**
+     * Solicita ao DAO para carregar os dados
+     * e os distribui para os repositórios.
+     * Carrega de um caminho específico.
+     */
+    public void carregarDados(String caminho) {
+        this.arquivoAtual = caminho;
+        File arquivo = new File(caminho);
 
         // Lida com o cenário de "primeira execução":
         // Se o arquivo de save não existe, não é um erro.
         // Apenas starto o sistema com os repositórios vazios.
         if (!arquivo.exists()) {
-            System.out.println("Arquivo de save (" + NOME_ARQUIVO + ") não encontrado. Começando com dados vazios.");
+            System.out.println("Arquivo de save (" + caminho + ") não encontrado. Começando com dados vazios.");
             return;
         }
         try {
-            DadosSistema dados = dao.carregar(NOME_ARQUIVO);
+            DadosSistema dados = dao.carregar(caminho);
 
             jogoRepository.carregarDados(dados.getJogos());
             dlcRepository.carregarDados(dados.getDlcs());
             usuarioRepository.carregarDados(dados.getUsuarios());
 
-            System.out.println("Dados carregados com sucesso de " + NOME_ARQUIVO);
+            System.out.println("Dados carregados com sucesso de " + caminho);
 
         } catch (Exception e) {
             System.err.println("Erro ao carregar dados: " + e.getMessage());

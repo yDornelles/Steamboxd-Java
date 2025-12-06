@@ -3,9 +3,11 @@ package steamboxd.view.gui;
 import steamboxd.data.Sistema;
 import steamboxd.view.IAppView;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.Component;
+import java.io.File;
 
 /**
  * Produto Concreto (GUI).
@@ -47,15 +49,34 @@ public class GraficaAppView implements IAppView {
 
             JMenuItem itemSalvar = new JMenuItem("Salvar");
             itemSalvar.addActionListener(e -> {
-                sistema.salvarDados(); //
+                sistema.salvarDados(); // Salva no arquivo atual configurado no Sistema
                 JOptionPane.showMessageDialog(frame, "Dados salvos com sucesso!");
             });
 
-            JMenuItem itemCarregar = new JMenuItem("Carregar");
+            // --- JFileChooser para Carregar ---
+            JMenuItem itemCarregar = new JMenuItem("Carregar Arquivo...");
             itemCarregar.addActionListener(e -> {
-                sistema.carregarDados();
-                JOptionPane.showMessageDialog(frame, "Dados recarregados! Troque de aba para ver as atualizações.");
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Selecione o arquivo de dados");
+
+                // Filtro para arquivos .txt
+                fileChooser.setFileFilter(new FileNameExtensionFilter("Arquivos de Texto (*.txt)", "txt"));
+
+                int resultado = fileChooser.showOpenDialog(frame);
+
+                if (resultado == JFileChooser.APPROVE_OPTION) {
+                    File arquivoSelecionado = fileChooser.getSelectedFile();
+                    String caminho = arquivoSelecionado.getAbsolutePath();
+
+                    // Chama o método sobrecarregado no Sistema (que aceita caminho)
+                    sistema.carregarDados(caminho);
+
+                    JOptionPane.showMessageDialog(frame,
+                            "Dados carregados de: " + arquivoSelecionado.getName() +
+                                    "\nTroque de aba para visualizar as atualizações.");
+                }
             });
+            // --------------------------------------------------
 
             JMenuItem itemSair = new JMenuItem("Sair");
             itemSair.addActionListener(e -> frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING)));

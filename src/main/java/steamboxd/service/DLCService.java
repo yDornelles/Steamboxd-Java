@@ -93,16 +93,6 @@ public class DLCService implements MidiaService<DLC> {
     }
 
     @Override
-    public boolean editarNota(String titulo, double novaNota) {
-        DLC dlc = repository.buscar(titulo);
-        if (dlc != null) {
-            dlc.setNota(novaNota);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public boolean editarAno(String titulo, int novoAno) {
         if (novoAno > 2025) {
             throw new IllegalArgumentException("O ano de lançamento deve ser válido (até 2025).");
@@ -128,6 +118,52 @@ public class DLCService implements MidiaService<DLC> {
         DLC dlc = repository.buscar(titulo);
         if (dlc != null) {
             dlc.setPreco(novoPreco);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean editarJogoBase(String tituloDlc, String novoJogoBaseTitulo) {
+        if (novoJogoBaseTitulo != null) {
+            novoJogoBaseTitulo = novoJogoBaseTitulo.trim();
+        }
+
+        DLC dlc = repository.buscar(tituloDlc);
+        if (dlc == null) return false;
+
+        String jogoBaseAntigo = dlc.getJogoBaseTitulo();
+
+        if (novoJogoBaseTitulo != null && !novoJogoBaseTitulo.isBlank()) {
+            if (jogoRepository.buscar(novoJogoBaseTitulo) == null) {
+                throw new IllegalArgumentException("O Jogo Base informado não existe.");
+            }
+        }
+
+        if (jogoBaseAntigo != null && !jogoBaseAntigo.isBlank()) {
+            Jogo jogoAntigo = jogoRepository.buscar(jogoBaseAntigo);
+            if (jogoAntigo != null) {
+                jogoAntigo.getDlcTitulos().remove(tituloDlc);
+            }
+        }
+
+        if (novoJogoBaseTitulo != null && !novoJogoBaseTitulo.isBlank()) {
+            Jogo jogoNovo = jogoRepository.buscar(novoJogoBaseTitulo);
+            if (jogoNovo != null) {
+                // Evita duplicatas
+                if (!jogoNovo.getDlcTitulos().contains(tituloDlc)) {
+                    jogoNovo.getDlcTitulos().add(tituloDlc);
+                }
+            }
+        }
+
+        dlc.setJogoBaseTitulo(novoJogoBaseTitulo == null ? "" : novoJogoBaseTitulo);
+        return true;
+    }
+
+    public boolean editarExpansao(String titulo, boolean novaExpansao) {
+        DLC dlc = repository.buscar(titulo);
+        if (dlc != null) {
+            dlc.setExpansao(novaExpansao);
             return true;
         }
         return false;
@@ -167,5 +203,23 @@ public class DLCService implements MidiaService<DLC> {
         plataformasAtuais.add(plataforma);
         dlc.setPlataformas(plataformasAtuais);
         return true;
+    }
+
+    public boolean atualizarGeneros(String titulo, List<String> novosGeneros) {
+        var midia = repository.buscar(titulo);
+        if (midia != null) {
+            midia.setGeneros(novosGeneros);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean atualizarPlataformas(String titulo, List<String> novasPlataformas) {
+        var midia = repository.buscar(titulo);
+        if (midia != null) {
+            midia.setPlataformas(novasPlataformas);
+            return true;
+        }
+        return false;
     }
 }

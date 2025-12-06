@@ -46,8 +46,12 @@ public class DLCController {
         return dlcService.listarTodos();
     }
 
-    public boolean editarNota(String titulo, double novaNota) {
-        return dlcService.editarNota(titulo, novaNota);
+    public boolean editarJogoBase(String tituloDlc, String novoJogoBase) {
+        return dlcService.editarJogoBase(tituloDlc, novoJogoBase);
+    }
+
+    public boolean editarExpansao(String titulo, boolean novaExpansao) {
+        return dlcService.editarExpansao(titulo, novaExpansao);
     }
 
     public boolean editarAno(String titulo, int novoAno) {
@@ -64,5 +68,13 @@ public class DLCController {
 
     public boolean adicionarPlataforma(String titulo, String plataforma) {
         return dlcService.adicionarPlataforma(titulo, plataforma);
+    }
+
+    public void atualizarGeneros(String titulo, List<String> novosGeneros) {
+        dlcService.atualizarGeneros(titulo, novosGeneros);
+    }
+
+    public void atualizarPlataformas(String titulo, List<String> novasPlataformas) {
+        dlcService.atualizarPlataformas(titulo, novasPlataformas);
     }
 }

@@ -70,7 +70,11 @@ public class DLC extends Midia {
     }
 
     public void setJogoBaseTitulo(String jogoBaseTitulo) {
-        this.jogoBaseTitulo = jogoBaseTitulo;
+        if (jogoBaseTitulo == null) {
+            this.jogoBaseTitulo = "";
+        } else {
+            this.jogoBaseTitulo = jogoBaseTitulo.trim();
+        }
     }
 
     public boolean isExpansao() {
@@ -81,11 +85,16 @@ public class DLC extends Midia {
         this.expansao = expansao;
     }
 
+    @Override
     public double getPreco() {
         return preco;
     }
 
+    @Override
     public void setPreco(double preco) {
+        if (preco < 0) {
+            throw new IllegalArgumentException("O preço não pode ser negativo.");
+        }
         this.preco = preco;
     }
 

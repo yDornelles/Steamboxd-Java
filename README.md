@@ -12,18 +12,18 @@ O sistema permite o gerenciamento de um catálogo ('Loja') e de bibliotecas pess
 
 A principal funcionalidade de negócio é que, ao adicionar uma mídia, o sistema cria um **clone** do objeto, permitindo ao usuário atribuir uma **nota pessoal** (de 0 a 10) que não afeta a mídia original da loja.
 
-Todo o estado da aplicação (listas de jogos, DLCs e usuários) é salvo em um arquivo `steamboxd.json` ao sair e recarregado ao iniciar.
+Todo o estado da aplicação (listas de jogos, DLCs e usuários) é salvo em um arquivo `steamboxd.txt` ao sair e recarregado ao iniciar.
 
 ## Funcionalidades Principais
 
 * **Interface Dupla:** O sistema pode ser executado em modo **Gráfico (Swing)** ou **Textual (Console)** através de uma única configuração.
-* **Gerenciamento da "Loja":** * CRUD completo para Jogos e DLCs.
+* **Gerenciamento da "Loja":** CRUD completo para Jogos e DLCs.
     * **Vínculo Jogo-DLC:** O sistema gerencia a relação onde um Jogo pode possuir múltiplas DLCs, e uma DLC pertence a um Jogo base.
 * **Gerenciamento de Usuários:** CRUD completo para Usuários, incluindo validação de email duplicado.
 * **Biblioteca Pessoal:**
     * Adicionar/Remover mídias da "Loja" para a biblioteca de um usuário.
     * Atribuição de notas pessoais (0-10) que são independentes da "Loja".
-* **Persistência de Dados:** Salvamento e carregamento automático do estado do sistema em formato JSON.
+* **Persistência de Dados:** Salvamento e carregamento automático do estado do sistema em formato txt.
 
 ## Demonstração
 
@@ -72,13 +72,7 @@ Para atender ao requisito de interface flexível (GUI ou Textual), foi usado o p
 ### Padrões de Infraestrutura (Singleton e DAO)
 
 * **Singleton:** A classe `Sistema` é um Singleton, garantindo que todos os `Services` e `Views` acessem a **mesma instância** dos repositórios e do mecanismo de persistência.
-* **DAO (Data Access Object):** A interface `PersistenciaDAO` abstrai a lógica de salvamento. A implementação concreta `JsonDAO` lida com os detalhes da biblioteca Gson, e o `Sistema` não precisa saber como o salvamento é feito.
-
-### Desafio de Polimorfismo: Gson e TypeAdapters
-
-Um desafio técnico significativo foi persistir a `List<Midia>`, pois o Gson, ao ler o JSON, não sabe se deve instanciar `new Jogo()` ou `new DLC()` (já que `Midia` é abstrata).
-
-Isso foi resolvido com um `RuntimeTypeAdapterFactory` (uma ferramenta padrão do ecossistema Gson). Essa fábrica "ensina" o Gson a injetar um campo `"type": "Jogo"` ou `"type": "DLC"` no JSON ao salvar, permitindo que o polimorfismo funcione perfeitamente durante o carregamento dos dados.
+* **DAO (Data Access Object):** A interface `PersistenciaDAO` abstrai a lógica de salvamento. A implementação concreta `TxtDAO` lida com os detalhes, e o `Sistema` não precisa saber como o salvamento é feito.
 
 ## Diagrama UML
 
@@ -88,13 +82,11 @@ Isso foi resolvido com um `RuntimeTypeAdapterFactory` (uma ferramenta padrão do
 
 * **Java 17**
 * **Java Swing** (para a GUI)
-* **Gson (Google)** (para persistência JSON)
 
 ## Como Executar
 
 1.  Clone o repositório.
 2.  Abra a pasta do projeto na sua IDE (ex: IntelliJ IDEA).
-    * O IntelliJ detectará automaticamente o arquivo `pom.xml` e baixará as dependências (Gson).
 3.  **Para escolher a interface:**
     * Abra o arquivo: `src/main/java/steamboxd/view/FabricaDeInterfaces.java`
     * Mude a constante estática `TIPO_ATUAL` para:

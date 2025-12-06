@@ -210,8 +210,10 @@ public class TextualAppView implements IAppView {
             System.out.println("\nO que você quer editar?");
             System.out.println("1. Editar Preço");
             System.out.println("2. Editar Ano");
-            System.out.println("3. Adicionar Gênero");
-            System.out.println("4. Adicionar Plataforma");
+            System.out.println("3. Editar Desenvolvedora");
+            System.out.println("4. Editar Multiplayer");
+            System.out.println("5. Adicionar Gênero");
+            System.out.println("6. Adicionar Plataforma");
             System.out.println("0. Voltar");
 
             int opcao = ConsoleUtil.lerInt("Opção: ");
@@ -228,10 +230,18 @@ public class TextualAppView implements IAppView {
                         sucesso = jogoController.editarAno(titulo, novoAno);
                         break;
                     case 3:
+                        String novaDev = ConsoleUtil.lerString("Nova Desenvolvedora: ").trim();
+                        sucesso = jogoController.editarDesenvolvedora(titulo, novaDev);
+                        break;
+                    case 4:
+                        boolean multi = ConsoleUtil.lerBoolean("Tem multiplayer (s/n): ");
+                        sucesso = jogoController.editarMultiplayer(titulo, multi);
+                        break;
+                    case 5:
                         String genero = ConsoleUtil.lerString("Novo Gênero: ").trim();
                         sucesso = jogoController.adicionarGenero(titulo, genero);
                         break;
-                    case 4:
+                    case 6:
                         String plataforma = ConsoleUtil.lerString("Nova Plataforma: ").trim();
                         sucesso = jogoController.adicionarPlataforma(titulo, plataforma);
                         break;
@@ -389,8 +399,10 @@ public class TextualAppView implements IAppView {
             System.out.println("\nO que você quer editar?");
             System.out.println("1. Editar Preço");
             System.out.println("2. Editar Ano");
-            System.out.println("3. Adicionar Gênero");
-            System.out.println("4. Adicionar Plataforma");
+            System.out.println("3. Editar Jogo Base");
+            System.out.println("4. Editar Expansão");
+            System.out.println("5. Adicionar Gênero");
+            System.out.println("6. Adicionar Plataforma");
             System.out.println("0. Voltar");
 
             int opcao = ConsoleUtil.lerInt("Opção: ");
@@ -407,10 +419,18 @@ public class TextualAppView implements IAppView {
                         sucesso = dlcController.editarAno(titulo, novoAno);
                         break;
                     case 3:
+                        String novoBase = ConsoleUtil.lerString("Novo Jogo Base (Enter para limpar): ").trim();
+                        sucesso = dlcController.editarJogoBase(titulo, novoBase);
+                        break;
+                    case 4:
+                        boolean exp = ConsoleUtil.lerBoolean("É expansão (s/n)? ");
+                        sucesso = dlcController.editarExpansao(titulo, exp);
+                        break;
+                    case 5:
                         String genero = ConsoleUtil.lerString("Novo Gênero: ").trim();
                         sucesso = dlcController.adicionarGenero(titulo, genero);
                         break;
-                    case 4:
+                    case 6:
                         String plataforma = ConsoleUtil.lerString("Nova Plataforma: ").trim();
                         sucesso = dlcController.adicionarPlataforma(titulo, plataforma);
                         break;

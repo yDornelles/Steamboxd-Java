@@ -72,7 +72,10 @@ public abstract class Midia implements Serializable {
     }
 
     public void setTitulo(String titulo) {
-        this.titulo = titulo;
+        if (titulo == null || titulo.trim().isEmpty()) {
+            throw new IllegalArgumentException("O título da mídia é obrigatório.");
+        }
+        this.titulo = titulo.trim();
     }
 
     public List<String> getGeneros() {
@@ -80,7 +83,11 @@ public abstract class Midia implements Serializable {
     }
 
     public void setGeneros(List<String> generos) {
-        this.generos = new ArrayList<>(generos);
+        if (generos == null) {
+            this.generos = new ArrayList<>();
+        } else {
+            this.generos = new ArrayList<>(generos);
+        }
     }
 
     public double getNota() {
@@ -88,6 +95,9 @@ public abstract class Midia implements Serializable {
     }
 
     public void setNota(double nota) {
+        if (nota < 0 || nota > 10) {
+            throw new IllegalArgumentException("A nota deve ser entre 0 e 10.");
+        }
         this.nota = nota;
     }
 
@@ -96,6 +106,12 @@ public abstract class Midia implements Serializable {
     }
 
     public void setAnoLancamento(int anoLancamento) {
+        if (anoLancamento > 2026) {
+            throw new IllegalArgumentException("O ano de lançamento não pode ser futuro.");
+        }
+        if (anoLancamento != 0 && anoLancamento < 1950) {
+            throw new IllegalArgumentException("Ano inválido (muito antigo).");
+        }
         this.anoLancamento = anoLancamento;
     }
 
@@ -104,7 +120,11 @@ public abstract class Midia implements Serializable {
     }
 
     public void setPlataformas(List<String> plataformas) {
-        this.plataformas = new ArrayList<>(plataformas);
+        if (plataformas == null) {
+            this.plataformas = new ArrayList<>();
+        } else {
+            this.plataformas = new ArrayList<>(plataformas);
+        }
     }
 
     /**
@@ -112,4 +132,8 @@ public abstract class Midia implements Serializable {
      * @return Uma String representando o tipo da Mídia.
      */
     public abstract String getTipo();
+
+    public abstract double getPreco();
+
+    public abstract void setPreco(double preco);
 }

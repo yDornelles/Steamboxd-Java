@@ -61,6 +61,20 @@ public class Usuario implements Serializable {
     }
 
     public void setNome(String nome) {
+        if (nome == null) {
+            throw new IllegalArgumentException("O nome do usuário é obrigatório.");
+        }
+
+        nome = nome.trim();
+
+        if (nome.isBlank()) {
+            throw new IllegalArgumentException("O novo nome não pode ser vazio.");
+        }
+
+        if (nome.matches(".*\\d.*")) {
+            throw new IllegalArgumentException("O nome do usuário não pode conter números.");
+        }
+
         this.nome = nome;
     }
 
@@ -69,6 +83,24 @@ public class Usuario implements Serializable {
     }
 
     public void setEmail(String email) {
+        if (email == null) {
+            throw new IllegalArgumentException("O email do usuário é obrigatório.");
+        }
+
+        email = email.trim();
+
+        if (email.isBlank()) {
+            throw new IllegalArgumentException("O novo email não pode ser vazio.");
+        }
+
+        if (!email.contains("@gmail.com")) {
+            throw new IllegalArgumentException("O email deve ser válido (conter '@').");
+        }
+
+        if (email.contains(" ")) {
+            throw new IllegalArgumentException("O email não pode conter espaços.");
+        }
+
         this.email = email;
     }
 

@@ -52,13 +52,11 @@ public class PainelJogos extends JPanel {
         atualizarTabela();
     }
 
-    /**
-     * Preenche a tabela.
-     */
     public void atualizarTabela() {
         tableModel.setRowCount(0);
         List<Jogo> jogos = jogoController.listarJogos();
         for (Jogo jogo : jogos) {
+            // Filtra listas vazias para N/A
             List<String> listaGeneros = jogo.getGeneros();
             String generos = listaGeneros.isEmpty() ? "N/A" : String.join(", ", listaGeneros);
 
@@ -66,7 +64,6 @@ public class PainelJogos extends JPanel {
             String plataformas = listaPlataformas.isEmpty() ? "N/A" : String.join(", ", listaPlataformas);
 
             Object anoExibicao = (jogo.getAnoLancamento() == 0) ? "N/A" : jogo.getAnoLancamento();
-
             String devExibicao = jogo.getDesenvolvedora().isEmpty() ? "N/A" : jogo.getDesenvolvedora();
 
             Object precoExibicao;
@@ -89,9 +86,6 @@ public class PainelJogos extends JPanel {
         }
     }
 
-    /**
-     * Pega o Jogo selecionado na tabela.
-     */
     private Jogo getJogoSelecionado() {
         int linhaSelecionada = tabela.getSelectedRow();
         if (linhaSelecionada == -1) {
@@ -103,16 +97,29 @@ public class PainelJogos extends JPanel {
     }
 
     /**
-     * Formulário de adição.
+     * Cria um painel de formulário reutilizável.
+     * Se receber um jogo (modo edição), preenche os campos.
+     * Se receber null (modo adição), deixa vazio.
      */
-    private JPanel criarFormularioJogo() {
-        JTextField txtTitulo = new JTextField();
-        JTextField txtAno = new JTextField();
-        JTextField txtPreco = new JTextField();
-        JTextField txtDev = new JTextField();
-        JCheckBox chkMulti = new JCheckBox("Multiplayer?");
-        JTextField txtGeneros = new JTextField();
-        JTextField txtPlataformas = new JTextField();
+    private JPanel criarFormularioJogo(Jogo jogo) {
+        JTextField txtTitulo = new JTextField(jogo != null ? jogo.getTitulo() : "");
+        JTextField txtAno = new JTextField(jogo != null ? (jogo.getAnoLancamento() == 0 ? "" : String.valueOf(jogo.getAnoLancamento())) : "");
+        JTextField txtPreco = new JTextField(jogo != null ? String.valueOf(jogo.getPreco()) : "");
+        JTextField txtDev = new JTextField(jogo != null ? jogo.getDesenvolvedora() : "");
+        JCheckBox chkMulti = new JCheckBox("Multiplayer?", jogo != null && jogo.isMultiplayer());
+
+        // Converte listas para String (vírgula)
+        String generosStr = jogo != null ? String.join(", ", jogo.getGeneros()) : "";
+        JTextField txtGeneros = new JTextField(generosStr);
+
+        String platStr = jogo != null ? String.join(", ", jogo.getPlataformas()) : "";
+        JTextField txtPlataformas = new JTextField(platStr);
+
+        // Bloqueia título na edição
+        if (jogo != null) {
+            txtTitulo.setEditable(false);
+            txtTitulo.setEnabled(false);
+        }
 
         JPanel painel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -120,182 +127,93 @@ public class PainelJogos extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
 
-        int linha = 0;
-        gbc.gridx = 0; gbc.gridy = linha; gbc.weightx = 0.0;
-        painel.add(new JLabel("Título:"), gbc);
-        gbc.gridx = 1; gbc.gridy = linha++; gbc.weightx = 1.0;
-        painel.add(txtTitulo, gbc);
+        // Método auxiliar para adicionar linhas (deixa o código limpo)
+        adicionarCampo(painel, gbc, 0, "Título:", txtTitulo);
+        adicionarCampo(painel, gbc, 1, "Ano:", txtAno);
+        adicionarCampo(painel, gbc, 2, "Preço:", txtPreco);
+        adicionarCampo(painel, gbc, 3, "Desenvolvedora:", txtDev);
+        adicionarCampo(painel, gbc, 4, "Gêneros (vírgula):", txtGeneros);
+        adicionarCampo(painel, gbc, 5, "Plataformas (vírgula):", txtPlataformas);
 
-        gbc.gridx = 0; gbc.gridy = linha; gbc.weightx = 0.0;
-        painel.add(new JLabel("Ano:"), gbc);
-        gbc.gridx = 1; gbc.gridy = linha++; gbc.weightx = 1.0;
-        painel.add(txtAno, gbc);
-
-        gbc.gridx = 0; gbc.gridy = linha; gbc.weightx = 0.0;
-        painel.add(new JLabel("Gêneros (separados por vírgula):"), gbc);
-        gbc.gridx = 1; gbc.gridy = linha++; gbc.weightx = 1.0;
-        painel.add(txtGeneros, gbc);
-
-        gbc.gridx = 0; gbc.gridy = linha; gbc.weightx = 0.0;
-        painel.add(new JLabel("Plataformas (separados por vírgula):"), gbc);
-        gbc.gridx = 1; gbc.gridy = linha++; gbc.weightx = 1.0;
-        painel.add(txtPlataformas, gbc);
-
-        gbc.gridx = 0; gbc.gridy = linha; gbc.weightx = 0.0;
-        painel.add(new JLabel("Preço:"), gbc);
-        gbc.gridx = 1; gbc.gridy = linha++; gbc.weightx = 1.0;
-        painel.add(txtPreco, gbc);
-
-        gbc.gridx = 0; gbc.gridy = linha; gbc.weightx = 0.0;
-        painel.add(new JLabel("Desenvolvedora:"), gbc);
-        gbc.gridx = 1; gbc.gridy = linha++; gbc.weightx = 1.0;
-        painel.add(txtDev, gbc);
-
-        gbc.gridx = 1; gbc.gridy = linha++; gbc.weightx = 1.0;
+        gbc.gridx = 1; gbc.gridy = 6;
         painel.add(chkMulti, gbc);
 
-        painel.putClientProperty("campos", new Object[]{txtTitulo, txtAno, txtGeneros, txtPlataformas, txtPreco, txtDev, chkMulti});
+        painel.putClientProperty("campos", new Object[]{txtTitulo, txtAno, txtPreco, txtDev, txtGeneros, txtPlataformas, chkMulti});
         return painel;
     }
 
-    /**
-     * Chama o controller com os dados do novo formulário.
-     */
+    private void adicionarCampo(JPanel p, GridBagConstraints gbc, int y, String label, Component cmp) {
+        gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0.0; p.add(new JLabel(label), gbc);
+        gbc.gridx = 1; gbc.weightx = 1.0; p.add(cmp, gbc);
+    }
+
     private void acaoAdicionar() {
-        JPanel painelDialog = criarFormularioJogo();
+        JPanel painelDialog = criarFormularioJogo(null);
         int result = JOptionPane.showConfirmDialog(this, painelDialog, "Adicionar Novo Jogo", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
         if (result == JOptionPane.OK_OPTION) {
-            Object[] campos = (Object[]) painelDialog.getClientProperty("campos");
-            JTextField txtTitulo = (JTextField) campos[0];
-            JTextField txtAno = (JTextField) campos[1];
-            JTextField txtGeneros = (JTextField) campos[2];
-            JTextField txtPlataformas = (JTextField) campos[3];
-            JTextField txtPreco = (JTextField) campos[4];
-            JTextField txtDev = (JTextField) campos[5];
-            JCheckBox chkMulti = (JCheckBox) campos[6];
-
-            try {
-                List<String> generos = Arrays.stream(txtGeneros.getText().split(","))
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .collect(Collectors.toList());
-                List<String> plataformas = Arrays.stream(txtPlataformas.getText().split(","))
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .collect(Collectors.toList());
-
-                int ano = 0;
-                if (!txtAno.getText().isBlank()) {
-                    ano = Integer.parseInt(txtAno.getText());
-                }
-
-                String precoTxt = txtPreco.getText().replace(',', '.').trim();
-                double preco = 0.0;
-                if (!precoTxt.isEmpty()) {
-                    preco = Double.parseDouble(precoTxt);
-                }
-
-                jogoController.adicionarJogo(
-                        txtTitulo.getText(),
-                        0.0,
-                        ano,
-                        generos,
-                        plataformas,
-                        txtDev.getText(),
-                        chkMulti.isSelected(),
-                        preco
-                );
-                atualizarTabela();
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Erro: Ano e Preço devem ser números válidos.", "Erro de Formato", JOptionPane.ERROR_MESSAGE);
-            } catch (IllegalArgumentException ex) {
-
-                JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Validação", JOptionPane.WARNING_MESSAGE);
-            }
+            processarSalvar(painelDialog, true);
         }
     }
 
-    /**
-     * Mostra um menu de opções.
-     */
     private void acaoEditar() {
         Jogo jogo = getJogoSelecionado();
         if (jogo == null) return;
 
-        String titulo = jogo.getTitulo();
+        JPanel painelDialog = criarFormularioJogo(jogo);
+        int result = JOptionPane.showConfirmDialog(this, painelDialog, "Editar Jogo: " + jogo.getTitulo(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            processarSalvar(painelDialog, false);
+        }
+    }
 
-        Object[] options = {"Editar Preço", "Editar Ano", "Adicionar Gênero", "Adicionar Plataforma", "Cancelar"};
-        int escolha = JOptionPane.showOptionDialog(this,
-                "O que você quer editar em '" + titulo + "'?",
-                "Editar Jogo",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-                null, options, options[0]);
+    /**
+     * Processa os dados do formulário e chama o controller.
+     */
+    private void processarSalvar(JPanel painel, boolean isAdicao) {
+        Object[] campos = (Object[]) painel.getClientProperty("campos");
+        JTextField txtTitulo = (JTextField) campos[0];
+        JTextField txtAno = (JTextField) campos[1];
+        JTextField txtPreco = (JTextField) campos[2];
+        JTextField txtDev = (JTextField) campos[3];
+        JTextField txtGeneros = (JTextField) campos[4];
+        JTextField txtPlataformas = (JTextField) campos[5];
+        JCheckBox chkMulti = (JCheckBox) campos[6];
 
-        boolean sucesso = false;
         try {
-            switch (escolha) {
-                case 0: // Editar Preço
-                    String novoPrecoStr = JOptionPane.showInputDialog(this, "Novo Preço:", jogo.getPreco());
-                    if (novoPrecoStr != null) {
-                        String precoTratado = novoPrecoStr.replace(",", ".").trim();
-                        double novoPreco = 0.0;
-                        if (!precoTratado.isEmpty()) {
-                            novoPreco = Double.parseDouble(precoTratado);
-                        }
-                        sucesso = jogoController.editarPreco(titulo, novoPreco);
-                    }
-                    break;
-                case 1: // Editar Ano
-                    String valorAtual = (jogo.getAnoLancamento() == 0) ? "" : String.valueOf(jogo.getAnoLancamento());
-                    String novoAnoStr = JOptionPane.showInputDialog(this, "Novo Ano (deixe vazio para 'N/A'):", valorAtual);
+            String titulo = txtTitulo.getText().trim();
 
-                    if (novoAnoStr != null) {
-                        int novoAno = 0;
-                        if (!novoAnoStr.isBlank()) {
-                            novoAno = Integer.parseInt(novoAnoStr);
-                        }
-                        sucesso = jogoController.editarAno(titulo, novoAno);
-                    }
-                    break;
-                case 2: // Adicionar Gênero
-                    String novoGenero = JOptionPane.showInputDialog(this, "Adicionar Gênero:");
-                    if (novoGenero != null && !novoGenero.isBlank()) {
-                        String[] lista = novoGenero.split(",");
-                        for (String g : lista) {
-                            if (!g.trim().isEmpty()) {
-                                sucesso = jogoController.adicionarGenero(titulo, g.trim());
-                            }
-                        }
-                    }
-                    break;
-                case 3: // Adicionar Plataforma
-                    String novaPlataforma = JOptionPane.showInputDialog(this, "Adicionar Plataforma:");
-                    if (novaPlataforma != null && !novaPlataforma.isBlank()) {
-                        String[] lista = novaPlataforma.split(",");
-                        for (String p : lista) {
-                            if (!p.trim().isEmpty()) {
-                                sucesso = jogoController.adicionarPlataforma(titulo, p.trim());
-                            }
-                        }
-                    }
-                    break;
-                case 4: // Cancelar
-                default:
-                    return;
-            }
+            int ano = 0;
+            if (!txtAno.getText().isBlank()) ano = Integer.parseInt(txtAno.getText());
 
-            if (sucesso) {
-                JOptionPane.showMessageDialog(this, "Alteração realizada com sucesso!");
-                atualizarTabela();
+            String precoTxt = txtPreco.getText().replace(',', '.').trim();
+            double preco = precoTxt.isEmpty() ? 0.0 : Double.parseDouble(precoTxt);
+
+            // Listas: Split, Trim e Filter (Empty)
+            List<String> generos = Arrays.stream(txtGeneros.getText().split(","))
+                    .map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
+
+            List<String> plataformas = Arrays.stream(txtPlataformas.getText().split(","))
+                    .map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
+
+            if (isAdicao) {
+                jogoController.adicionarJogo(titulo, 0.0, ano, generos, plataformas, txtDev.getText(), chkMulti.isSelected(), preco);
             } else {
-                atualizarTabela();
+                // MODO EDIÇÃO: Atualiza tudo
+                jogoController.editarAno(titulo, ano);
+                jogoController.editarPreco(titulo, preco);
+                jogoController.editarDesenvolvedora(titulo, txtDev.getText());
+                jogoController.editarMultiplayer(titulo, chkMulti.isSelected());
+                jogoController.atualizarGeneros(titulo, generos);
+                jogoController.atualizarPlataformas(titulo, plataformas);
             }
+
+            atualizarTabela();
+            JOptionPane.showMessageDialog(this, "Salvo com sucesso!");
+
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Valor numérico inválido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Erro: Ano ou Preço inválidos.", "Erro de Formato", JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de Validação", JOptionPane.WARNING_MESSAGE);
         }
     }
 

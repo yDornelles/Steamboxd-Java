@@ -62,16 +62,6 @@ public class JogoService implements MidiaService<Jogo> {
     }
 
     @Override
-    public boolean editarNota(String titulo, double novaNota) {
-        Jogo jogo = repository.buscar(titulo);
-        if (jogo != null) {
-            jogo.setNota(novaNota);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public boolean editarAno(String titulo, int novoAno) {
         if (novoAno > 2025) {
             throw new IllegalArgumentException("O ano de lançamento deve ser válido (até 2025).");
@@ -97,6 +87,28 @@ public class JogoService implements MidiaService<Jogo> {
         Jogo jogo = repository.buscar(titulo);
         if (jogo != null) {
             jogo.setPreco(novoPreco);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean editarDesenvolvedora(String titulo, String novaDev) {
+        Jogo jogo = repository.buscar(titulo);
+        if (jogo != null) {
+            if (novaDev == null || novaDev.isBlank()) {
+                jogo.setDesenvolvedora("");
+            } else {
+                jogo.setDesenvolvedora(novaDev.trim());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean editarMultiplayer(String titulo, boolean novoStatus) {
+        Jogo jogo = repository.buscar(titulo);
+        if (jogo != null) {
+            jogo.setMultiplayer(novoStatus);
             return true;
         }
         return false;
@@ -136,5 +148,23 @@ public class JogoService implements MidiaService<Jogo> {
         plataformasAtuais.add(plataforma);
         jogo.setPlataformas(plataformasAtuais);
         return true;
+    }
+
+    public boolean atualizarGeneros(String titulo, List<String> novosGeneros) {
+        var midia = repository.buscar(titulo);
+        if (midia != null) {
+            midia.setGeneros(novosGeneros);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean atualizarPlataformas(String titulo, List<String> novasPlataformas) {
+        var midia = repository.buscar(titulo);
+        if (midia != null) {
+            midia.setPlataformas(novasPlataformas);
+            return true;
+        }
+        return false;
     }
 }

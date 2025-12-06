@@ -46,8 +46,12 @@ public class JogoController {
         return jogoService.listarTodos();
     }
 
-    public boolean editarNota(String titulo, double novaNota) {
-        return jogoService.editarNota(titulo, novaNota);
+    public boolean editarDesenvolvedora(String titulo, String novaDev) {
+        return jogoService.editarDesenvolvedora(titulo, novaDev);
+    }
+
+    public boolean editarMultiplayer(String titulo, boolean novoStatus) {
+        return jogoService.editarMultiplayer(titulo, novoStatus);
     }
 
     public boolean editarAno(String titulo, int novoAno) {
@@ -64,5 +68,13 @@ public class JogoController {
 
     public boolean adicionarPlataforma(String titulo, String plataforma) {
         return jogoService.adicionarPlataforma(titulo, plataforma);
+    }
+
+    public void atualizarGeneros(String titulo, List<String> novosGeneros) {
+        jogoService.atualizarGeneros(titulo, novosGeneros);
+    }
+
+    public void atualizarPlataformas(String titulo, List<String> novasPlataformas) {
+        jogoService.atualizarPlataformas(titulo, novasPlataformas);
     }
 }
